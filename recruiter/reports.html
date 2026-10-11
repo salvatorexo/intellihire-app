@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reports | IntelliHire</title>
+    <link rel="stylesheet" href="../css/dashboard.css" />
+    <link rel="stylesheet" href="../css/recruiter.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+        .kpi-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 22px;
+        }
+        .kpi-card .kpi-label {
+            font-size: 0.82rem;
+            color: var(--gray);
+            margin-bottom: 8px;
+        }
+        .kpi-card .kpi-value {
+            font-size: 1.9rem;
+            font-weight: 700;
+            color: var(--dark);
+            line-height: 1;
+        }
+        .kpi-card .kpi-sub {
+            font-size: 0.78rem;
+            color: var(--gray);
+            margin-top: 6px;
+        }
+        .kpi-card .kpi-value.green  { color: #16a34a; }
+        .kpi-card .kpi-value.yellow { color: #d97706; }
+        .kpi-card .kpi-value.red    { color: #dc2626; }
+        .kpi-card .kpi-value.purple { color: #7c3aed; }
+
+        .chart-panel {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 22px;
+            margin-bottom: 22px;
+        }
+        .chart-panel h3 {
+            font-size: 1rem;
+            margin-bottom: 18px;
+        }
+    </style>
+</head>
+<body>
+<div class="app-layout">
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo"><span class="logo-mark">IHR</span><span class="logo-text">IntelliHire</span></div>
+        <nav class="sidebar-nav">
+            <a href="recruiterdash.html" class="nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
+            <a href="company.html" class="nav-item"><span class="nav-icon">🏢</span> Company Profile</a>
+            <a href="my-vacancies.html" class="nav-item"><span class="nav-icon">💼</span> My Vacancies</a>
+            <a href="post-vacancy.html" class="nav-item"><span class="nav-icon">➕</span> Post Vacancy</a>
+            <a href="applications.html" class="nav-item"><span class="nav-icon">📋</span> Applications</a>
+            <a href="applications.html?filter=shortlisted" class="nav-item"><span class="nav-icon">⭐</span> Shortlisted</a>
+            <a href="applications.html?filter=interview" class="nav-item"><span class="nav-icon">🎤</span> Interviews</a>
+            <a href="reports.html" class="nav-item active"><span class="nav-icon">📊</span> Reports</a>
+            <a href="../php/logout.php" class="nav-item logout"><span class="nav-icon">🚪</span> Logout</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <button class="menu-toggle" id="menuToggle">☰</button>
+            <h2>Reports & Analytics</h2>
+            <button class="btn btn-outline" onclick="window.print()">🖨 Print</button>
+        </header>
+
+        <!-- KPI Cards -->
+        <section class="kpi-grid" id="kpiGrid">
+            <div class="kpi-card"><div class="kpi-label">Total Vacancies</div><div class="kpi-value" id="kpiVacancies">—</div><div class="kpi-sub" id="kpiVacanciesSub">all time</div></div>
+            <div class="kpi-card"><div class="kpi-label">Active Vacancies</div><div class="kpi-value green" id="kpiActive">—</div><div class="kpi-sub">currently open</div></div>
+            <div class="kpi-card"><div class="kpi-label">Total Applications</div><div class="kpi-value" id="kpiApplications">—</div><div class="kpi-sub">all time</div></div>
+            <div class="kpi-card"><div class="kpi-label">Shortlist Rate</div><div class="kpi-value green" id="kpiShortlistRate">—</div><div class="kpi-sub">% of applicants</div></div>
+            <div class="kpi-card"><div class="kpi-label">Interview Rate</div><div class="kpi-value purple" id="kpiInterviewRate">—</div><div class="kpi-sub">% of applicants</div></div>
+            <div class="kpi-card"><div class="kpi-label">Avg AI Match Score</div><div class="kpi-value yellow" id="kpiAvgScore">—</div><div class="kpi-sub">across all applicants</div></div>
+        </section>
+
+        <!-- Charts -->
+        <div class="chart-panel">
+            <h3>Applications per Month (Last 6 Months)</h3>
+            <canvas id="monthlyChart" height="110"></canvas>
+        </div>
+
+        <div class="progress-grid" style="margin-bottom:22px;">
+            <div class="chart-panel">
+                <h3>Applications by Status</h3>
+                <canvas id="statusChart" height="200"></canvas>
+            </div>
+            <div class="chart-panel">
+                <h3>AI Match Score Distribution</h3>
+                <canvas id="scoreChart" height="200"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-panel">
+            <h3>Top Vacancies by Applications</h3>
+            <canvas id="vacanciesChart" height="120"></canvas>
+        </div>
+
+        <!-- Best Performing Vacancy -->
+        <div class="chart-panel">
+            <h3>Best Performing Vacancy</h3>
+            <div id="topVacancy" style="padding:8px 0;">
+                <p class="empty">Loading...</p>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="../js/csrf.js"></script>
+<script src="../js/recruiter-reports.js"></script>
+</body>
+</html>

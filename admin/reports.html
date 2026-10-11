@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reports | IntelliHire</title>
+    <link rel="stylesheet" href="../css/dashboard.css" />
+    <link rel="stylesheet" href="../css/admin.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+<div class="app-layout">
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo"><span class="logo-mark">IHR</span><span class="logo-text">IntelliHire</span></div>
+        <nav class="sidebar-nav">
+            <a href="admindash.html" class="nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
+            <a href="users.html" class="nav-item"><span class="nav-icon">👥</span> Users</a>
+            <a href="companies.html" class="nav-item"><span class="nav-icon">🏢</span> Companies</a>
+            <a href="vacancies.html" class="nav-item"><span class="nav-icon">💼</span> Vacancies</a>
+            <a href="applications.html" class="nav-item"><span class="nav-icon">📋</span> Applications</a>
+            <a href="reports.html" class="nav-item active"><span class="nav-icon">📊</span> Reports</a>
+            <a href="../php/logout.php" class="nav-item logout"><span class="nav-icon">🚪</span> Logout</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <button class="menu-toggle" id="menuToggle">☰</button>
+            <h2>System Reports</h2>
+            <button class="btn btn-outline" onclick="window.print()">🖨 Print</button>
+        </header>
+
+        <section class="stats-grid">
+            <div class="stat-card"><div class="stat-icon blue">📈</div><div><h3 id="rConversion">0%</h3><p>Application → Interview Rate</p></div></div>
+            <div class="stat-card"><div class="stat-icon green">⭐</div><div><h3 id="rShortlistRate">0%</h3><p>Shortlist Rate</p></div></div>
+            <div class="stat-card"><div class="stat-icon purple">🎯</div><div><h3 id="rAvgScore">0%</h3><p>Avg AI Match Score</p></div></div>
+            <div class="stat-card"><div class="stat-icon yellow">🏆</div><div><h3 id="rTopIndustry">—</h3><p>Top Hiring Industry</p></div></div>
+        </section>
+
+        <section class="progress-grid">
+            <div class="panel">
+                <div class="panel-head"><h3>Applications per Month</h3></div>
+                <canvas id="monthlyChart" height="200"></canvas>
+            </div>
+            <div class="panel">
+                <div class="panel-head"><h3>Top Companies by Vacancies</h3></div>
+                <canvas id="companyChart" height="200"></canvas>
+            </div>
+        </section>
+
+        <section class="panel">
+            <div class="panel-head"><h3>AI Score Distribution</h3></div>
+            <canvas id="scoreChart" height="120"></canvas>
+        </section>
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+document.getElementById('menuToggle')?.addEventListener('click', () => {
+    document.getElementById('sidebar').classList.toggle('open');
+});
+
+async function loadReports() {
+    const res = await fetch('../php/admin-stats.php?reports=1');
+    const data = await res.json();
+    if (!data.success) return;
+
+    const r = data.reports;
+    document.getElementById('rConversion').textContent    = r.conversion_rate + '%';
+    document.getElementById('rShortlistRate').textContent = r.shortlist_rate + '%';
+    document.getElementById('rAvgScore').textContent      = r.avg_score + '%';
+    document.getElementById('rTopIndustry').textContent   = r.top_industry || '—';
+
+    new Chart(document.getElementById('monthlyChart'), {
+        type: 'bar',
+        data: {
+            labels: r.monthly.labels,
+            datasets: [{ label: 'Applications', data: r.monthly.values, backgroundColor: '#2563eb' }]
+        },
+        options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+    });
+
+    new Chart(document.getElementById('companyChart'), {
+        type: 'bar',
+        data: {
+            labels: r.top_companies.labels,
+            datasets: [{ label: 'Vacancies', data: r.top_companies.values, backgroundColor: '#22c55e' }]
+        },
+        options: { indexAxis: 'y', plugins: { legend: { display: false } } }
+    });
+
+    new Chart(document.getElementById('scoreChart'), {
+        type: 'bar',
+        data: {
+            labels: ['0–20', '21–40', '41–60', '61–80', '81–100'],
+            datasets: [{ label: 'Candidates', data: r.score_distribution, backgroundColor: ['#ef4444','#f97316','#eab308','#22c55e','#16a34a'] }]
+        },
+        options: { plugins: { legend: { display: false } } }
+    });
+}
+
+loadReports();
+</script>
+</body>
+</html>

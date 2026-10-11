@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Choose Your Role | IntelliHire</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <style>
+    /* Minimal fallback so page always looks decent */
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+    body { background: #f8fafc; color: #0f172a; }
+    
+    .navbar {
+        background: rgba(255,255,255,0.95);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+        position: sticky; top: 0; z-index: 1000;
+    }
+    .container { width: 90%; max-width: 1200px; margin: 0 auto; }
+    .nav-container {
+        display: flex; justify-content: space-between; align-items: center;
+        padding: 16px 0;
+    }
+    .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: inherit; }
+    .logo-mark {
+        background: #2563eb; color: #fff;
+        padding: 6px 10px; border-radius: 8px;
+        font-size: 0.9rem; font-weight: 700; letter-spacing: 1px;
+    }
+    .logo-text { font-weight: 700; font-size: 1.2rem; }
+    .nav-links { display: flex; gap: 20px; align-items: center; }
+    
+    .btn {
+        display: inline-block;
+        padding: 10px 22px;
+        border-radius: 8px;
+        font-weight: 500;
+        font-size: 0.95rem;
+        text-decoration: none;
+        border: 2px solid transparent;
+        transition: all 0.25s ease;
+        cursor: pointer;
+    }
+    .btn-primary { background: #2563eb; color: #fff; }
+    .btn-primary:hover { background: #1e40af; transform: translateY(-1px); }
+    .btn-outline {
+        border-color: #2563eb; color: #2563eb; background: transparent;
+    }
+    .btn-outline:hover { background: #2563eb; color: #fff; }
+</style>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        .role-wrapper {
+            min-height: calc(100vh - 70px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #eff6ff 0%, #ffffff 100%);
+        }
+        .role-inner {
+            width: 100%;
+            max-width: 900px;
+            text-align: center;
+        }
+        .role-inner h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+        .role-inner > p {
+            color: var(--gray);
+            font-size: 1.05rem;
+            margin-bottom: 40px;
+        }
+        .role-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+        .role-card {
+            background: var(--white);
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            padding: 40px 30px;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            text-align: center;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        .role-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-6px);
+            box-shadow: 0 16px 40px rgba(37, 99, 235, 0.15);
+        }
+        .role-icon {
+            font-size: 3.5rem;
+            margin-bottom: 18px;
+            display: block;
+        }
+        .role-card h2 {
+            font-size: 1.35rem;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+        .role-card p {
+            color: var(--gray);
+            font-size: 0.92rem;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+        .role-card .btn {
+            display: inline-block;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 40px;
+            color: var(--gray);
+            font-size: 0.9rem;
+            text-decoration: none;
+        }
+        .back-link:hover { color: var(--primary); }
+
+        @media (max-width: 700px) {
+            .role-grid { grid-template-columns: 1fr; }
+            .role-inner h1 { font-size: 1.6rem; }
+            .role-card { padding: 30px 22px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ================= NAVBAR ================= -->
+<header class="navbar">
+    <div class="container nav-container">
+        <a href="index.html" class="logo">
+            <span class="logo-mark">IHR</span>
+            <span class="logo-text">IntelliHire</span>
+        </a>
+        <nav class="nav-links">
+            <a href="login.html" class="btn btn-outline">Login</a>
+        </nav>
+    </div>
+</header>
+
+<!-- ================= ROLE SELECTION ================= -->
+<main class="role-wrapper">
+    <div class="role-inner">
+        <h1>How would you like to use IntelliHire?</h1>
+        <p>Choose your role to create the right account for you.</p>
+
+        <div class="role-grid">
+
+            <!-- Applicant -->
+            <a href="register.html?role=applicant" class="role-card" id="applicantCard">
+                <span class="role-icon">👤</span>
+                <h2>I'm Looking for a Job</h2>
+                <p>Create your profile, upload your CV, and let our AI match you with the best opportunities.</p>
+                <span class="btn btn-primary">Continue as Applicant</span>
+            </a>
+
+            <!-- Recruiter -->
+            <a href="register.html?role=recruiter" class="role-card" id="recruiterCard">
+                <span class="role-icon">🏢</span>
+                <h2>I'm Hiring</h2>
+                <p>Post vacancies and use AI-powered CV screening to find the top candidates fast.</p>
+                <span class="btn btn-primary">Continue as Recruiter</span>
+            </a>
+
+        </div>
+
+        <a href="index.html" class="back-link">← Back to Home</a>
+    </div>
+</main>
+
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Recruiter Dashboard | IntelliHire</title>
+    <link rel="stylesheet" href="../css/dashboard.css" />
+    <link rel="stylesheet" href="../css/recruiter.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+<div class="app-layout">
+
+    <!-- ================= SIDEBAR ================= -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <span class="logo-mark">IHR</span>
+            <span class="logo-text">IntelliHire</span>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="recruiterdash.html" class="nav-item active"><span class="nav-icon">🏠</span> Dashboard</a>
+            <a href="company.html" class="nav-item"><span class="nav-icon">🏢</span> Company Profile</a>
+            <a href="my-vacancies.html" class="nav-item"><span class="nav-icon">💼</span> My Vacancies</a>
+            <a href="post-vacancy.html" class="nav-item"><span class="nav-icon">➕</span> Post Vacancy</a>
+            <a href="applications.html" class="nav-item"><span class="nav-icon">📋</span> Applications</a>
+            <a href="applications.html?filter=shortlisted" class="nav-item"><span class="nav-icon">⭐</span> Shortlisted</a>
+            <a href="applications.html?filter=interview" class="nav-item"><span class="nav-icon">🎤</span> Interviews</a>
+            <a href="reports.html" class="nav-item"><span class="nav-icon">📊</span> Reports</a>
+            <a href="../php/logout.php" class="nav-item logout"><span class="nav-icon">🚪</span> Logout</a>
+        </nav>
+    </aside>
+
+    <!-- ================= MAIN ================= -->
+    <main class="main-content">
+
+        <header class="topbar">
+            <button class="menu-toggle" id="menuToggle">☰</button>
+            <h2>Recruiter Dashboard</h2>
+            <div class="user-info">
+                <span id="userName">Loading...</span>
+                <div class="avatar" id="userAvatar">R</div>
+            </div>
+        </header>
+
+        <!-- Welcome -->
+        <section class="welcome-banner">
+            <div>
+                <h1>Welcome, <span id="welcomeName">Recruiter</span> 👋</h1>
+                <p id="welcomeCompany">Manage your vacancies and discover top talent with AI.</p>
+            </div>
+        </section>
+
+        <!-- Stats -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon blue">💼</div>
+                <div>
+                    <h3 id="statVacancies">0</h3>
+                    <p>Total Vacancies</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon yellow">📨</div>
+                <div>
+                    <h3 id="statApplications">0</h3>
+                    <p>Total Applications</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon green">⭐</div>
+                <div>
+                    <h3 id="statShortlisted">0</h3>
+                    <p>Shortlisted</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon purple">🎤</div>
+                <div>
+                    <h3 id="statInterviews">0</h3>
+                    <p>Interviews</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon red">❌</div>
+                <div>
+                    <h3 id="statRejected">0</h3>
+                    <p>Rejected</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Grid: Recent Applications + Top Candidates -->
+        <section class="progress-grid">
+
+            <!-- Recent Applications -->
+            <div class="panel">
+                <div class="panel-head">
+                    <h3>Recent Applications</h3>
+                    <a href="applications.html" class="link">View all →</a>
+                </div>
+                <div class="table-wrap">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Candidate</th>
+                                <th>Vacancy</th>
+                                <th>Applied</th>
+                                <th>Score</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentAppsBody">
+                            <tr><td colspan="5" class="empty">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Top Ranked -->
+            <div class="panel">
+                <div class="panel-head">
+                    <h3>Top Ranked Candidates 🤖</h3>
+                    <span class="link">By AI score</span>
+                </div>
+                <div id="topCandidates">
+                    <p class="empty">Loading...</p>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+</div>
+<script src="../js/csrf.js"></script>
+<script src="../js/recruiter-dash.js"></script>
+</body>
+</html>

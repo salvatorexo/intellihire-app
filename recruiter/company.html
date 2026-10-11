@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Company Profile | IntelliHire</title>
+    <link rel="stylesheet" href="../css/dashboard.css" />
+    <link rel="stylesheet" href="../css/recruiter.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        .company-header {
+            background: linear-gradient(135deg, #2563eb, #1e40af);
+            border-radius: 16px;
+            padding: 30px;
+            color: var(--white);
+            display: flex;
+            gap: 24px;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+        .company-logo-box {
+            width: 110px;
+            height: 110px;
+            border-radius: 16px;
+            background: rgba(255,255,255,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            flex-shrink: 0;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            border: 2px dashed rgba(255,255,255,0.4);
+            transition: all 0.2s;
+        }
+        .company-logo-box:hover { border-color: var(--white); }
+        .company-logo-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .company-logo-box .overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            color: white;
+        }
+        .company-logo-box:hover .overlay { display: flex; }
+
+        .company-info h1 {
+            font-size: 1.6rem;
+            margin-bottom: 6px;
+        }
+        .company-info p {
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+        .company-tags {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+        .company-tags span {
+            background: rgba(255,255,255,0.2);
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 0.78rem;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group.full { grid-column: 1 / -1; }
+        .form-group label {
+            font-size: 0.88rem;
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            padding: 11px 14px;
+            border: 1.5px solid var(--border);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.92rem;
+            background: #f8fafc;
+        }
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: var(--white);
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 90px;
+        }
+        .req { color: var(--danger); }
+
+        .stats-mini {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+        .stat-mini {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+        .stat-mini h4 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+        .stat-mini p {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+
+        @media (max-width: 700px) {
+            .form-grid { grid-template-columns: 1fr; }
+            .company-header { flex-direction: column; text-align: center; }
+            .company-tags { justify-content: center; }
+            .stats-mini { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="app-layout">
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo"><span class="logo-mark">IHR</span><span class="logo-text">IntelliHire</span></div>
+        <nav class="sidebar-nav">
+            <a href="recruiterdash.html" class="nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
+            <a href="company.html" class="nav-item active"><span class="nav-icon">🏢</span> Company Profile</a>
+            <a href="my-vacancies.html" class="nav-item"><span class="nav-icon">💼</span> My Vacancies</a>
+            <a href="post-vacancy.html" class="nav-item"><span class="nav-icon">➕</span> Post Vacancy</a>
+            <a href="applications.html" class="nav-item"><span class="nav-icon">📋</span> Applications</a>
+            <a href="applications.html?filter=shortlisted" class="nav-item"><span class="nav-icon">⭐</span> Shortlisted</a>
+            <a href="applications.html?filter=interview" class="nav-item"><span class="nav-icon">🎤</span> Interviews</a>
+            <a href="reports.html" class="nav-item"><span class="nav-icon">📊</span> Reports</a>
+            <a href="../php/logout.php" class="nav-item logout"><span class="nav-icon">🚪</span> Logout</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <button class="menu-toggle" id="menuToggle">☰</button>
+            <h2>Company Profile</h2>
+        </header>
+
+        <div id="alertBox" class="alert" style="display:none;"></div>
+
+        <!-- Header Card -->
+        <section class="company-header">
+            <div class="company-logo-box" id="logoBox" title="Click to upload logo">
+                <span id="logoPlaceholder">🏢</span>
+                <img id="logoImg" style="display:none;" alt="Company Logo" />
+                <div class="overlay">Upload</div>
+                <input type="file" id="logoInput" accept="image/png,image/jpeg,image/jpg,image/webp" hidden />
+            </div>
+
+            <div class="company-info">
+                <h1 id="headerName">Loading...</h1>
+                <p id="headerIndustry">—</p>
+                <div class="company-tags" id="headerTags"></div>
+            </div>
+        </section>
+
+        <!-- Mini Stats -->
+        <section class="stats-mini">
+            <div class="stat-mini">
+                <h4 id="statTotalVacancies">0</h4>
+                <p>Total Vacancies</p>
+            </div>
+            <div class="stat-mini">
+                <h4 id="statActiveVacancies">0</h4>
+                <p>Active Vacancies</p>
+            </div>
+            <div class="stat-mini">
+                <h4 id="statApplications">0</h4>
+                <p>Applications Received</p>
+            </div>
+        </section>
+
+        <!-- Edit Form -->
+        <form id="companyForm" class="panel">
+            <h3 style="margin-bottom:18px;">Edit Company Information</h3>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Company Name <span class="req">*</span></label>
+                    <input type="text" id="company_name" required />
+                </div>
+                <div class="form-group">
+                    <label>Industry / Business Type <span class="req">*</span></label>
+                    <select id="industry" required>
+                        <option value="">-- Select --</option>
+                        <option value="Technology">Technology / IT</option>
+                        <option value="Finance">Finance / Banking</option>
+                        <option value="Healthcare">Healthcare</option>
+                        <option value="Education">Education</option>
+                        <option value="Retail">Retail / E-commerce</option>
+                        <option value="Manufacturing">Manufacturing</option>
+                        <option value="Construction">Construction</option>
+                        <option value="Agriculture">Agriculture</option>
+                        <option value="Media">Media / Entertainment</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Company Email <span class="req">*</span></label>
+                    <input type="email" id="company_email" required />
+                </div>
+                <div class="form-group">
+                    <label>Company Phone <span class="req">*</span></label>
+                    <input type="tel" id="company_phone" required />
+                </div>
+
+                <div class="form-group">
+                    <label>Company Location <span class="req">*</span></label>
+                    <input type="text" id="company_location" required />
+                </div>
+                <div class="form-group">
+                    <label>Website</label>
+                    <input type="url" id="website" placeholder="https://example.com" />
+                </div>
+
+                <div class="form-group full">
+                    <label>Company Description</label>
+                    <textarea id="description" placeholder="Tell applicants about your company..."></textarea>
+                </div>
+            </div>
+
+            <div style="margin-top:24px; display:flex; gap:12px;">
+                <button type="submit" class="btn btn-primary" id="saveBtn">Save Changes</button>
+                <a href="recruiterdash.html" class="btn btn-outline">Cancel</a>
+            </div>
+        </form>
+    </main>
+</div>
+
+<script src="../js/csrf.js"></script>
+<script src="../js/company.js"></script>
+</body>
+</html>

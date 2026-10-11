@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Applications | IntelliHire</title>
+    <link rel="stylesheet" href="../css/dashboard.css" />
+    <link rel="stylesheet" href="../css/vacancies.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        .app-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 16px;
+            margin-bottom: 14px;
+            transition: 0.2s;
+        }
+        .app-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 6px 16px rgba(15,23,42,0.05);
+        }
+        .app-card h3 { font-size: 1.05rem; margin-bottom: 4px; }
+        .app-card .company {
+            color: var(--primary);
+            font-weight: 500;
+            font-size: 0.88rem;
+            margin-bottom: 10px;
+        }
+        .app-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+        .app-meta span {
+            background: var(--light);
+            padding: 4px 10px;
+            border-radius: 50px;
+        }
+        .app-score {
+            text-align: right;
+            flex-shrink: 0;
+        }
+        .app-score .num {
+            font-size: 1.8rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+        .app-score .lbl {
+            font-size: 0.75rem;
+            color: var(--gray);
+            margin-top: 4px;
+        }
+        .status-pill.applied     { background: #dbeafe; color: #1e40af; }
+        .status-pill.review      { background: #fef3c7; color: #92400e; }
+        .status-pill.shortlisted { background: #dcfce7; color: #166534; }
+        .status-pill.interview   { background: #ede9fe; color: #6d28d9; }
+        .status-pill.accepted    { background: #bbf7d0; color: #14532d; }
+        .status-pill.rejected    { background: #fee2e2; color: #991b1b; }
+        .status-pill.hired       { background: #bbf7d0; color: #14532d; }
+    </style>
+</head>
+<body>
+<div class="app-layout">
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo"><span class="logo-mark">IHR</span><span class="logo-text">IntelliHire</span></div>
+        <nav class="sidebar-nav">
+            <a href="applicantdash.html" class="nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
+            <a href="profile.html" class="nav-item"><span class="nav-icon">👤</span> My Profile</a>
+            <a href="cv.html" class="nav-item"><span class="nav-icon">📄</span> My CV</a>
+            <a href="find-jobs.html" class="nav-item"><span class="nav-icon">🔍</span> Find Jobs</a>
+            <a href="applications.html" class="nav-item active"><span class="nav-icon">📋</span> My Applications</a>
+            <a href="notifications.html" class="nav-item"><span class="nav-icon">🔔</span> Notifications</a>
+            <a href="../php/logout.php" class="nav-item logout"><span class="nav-icon">🚪</span> Logout</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <button class="menu-toggle" id="menuToggle">☰</button>
+            <h2>My Applications</h2>
+        </header>
+
+        <div id="alertBox" class="alert" style="display:none;"></div>
+
+        <!-- Filter tabs -->
+        <div class="filters-panel" style="margin-bottom:16px;">
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                <button class="btn btn-primary" data-filter="">All</button>
+                <button class="btn btn-outline" data-filter="applied">Applied</button>
+                <button class="btn btn-outline" data-filter="review">Under Review</button>
+                <button class="btn btn-outline" data-filter="shortlisted">Shortlisted</button>
+                <button class="btn btn-outline" data-filter="interview">Interview</button>
+                <button class="btn btn-outline" data-filter="rejected">Rejected</button>
+            </div>
+        </div>
+
+        <div id="applicationsList">
+            <p class="empty">Loading applications...</p>
+        </div>
+    </main>
+</div>
+<script src="../js/csrf.js"></script>
+<script src="../js/applications-applicant.js"></script>
+</body>
+</html>

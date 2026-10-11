@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>All Applications | IntelliHire</title>
+    <link rel="stylesheet" href="../css/dashboard.css" />
+    <link rel="stylesheet" href="../css/admin.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+<div class="app-layout">
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo"><span class="logo-mark">IHR</span><span class="logo-text">IntelliHire</span></div>
+        <nav class="sidebar-nav">
+            <a href="admindash.html" class="nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
+            <a href="users.html" class="nav-item"><span class="nav-icon">👥</span> Users</a>
+            <a href="companies.html" class="nav-item"><span class="nav-icon">🏢</span> Companies</a>
+            <a href="vacancies.html" class="nav-item"><span class="nav-icon">💼</span> Vacancies</a>
+            <a href="applications.html" class="nav-item active"><span class="nav-icon">📋</span> Applications</a>
+            <a href="reports.html" class="nav-item"><span class="nav-icon">📊</span> Reports</a>
+            <a href="../php/logout.php" class="nav-item logout"><span class="nav-icon">🚪</span> Logout</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <button class="menu-toggle" id="menuToggle">☰</button>
+            <h2>All Applications</h2>
+        </header>
+
+        <div class="admin-search-bar">
+            <input type="text" id="search" placeholder="🔍 Search candidate, job, or company..." />
+            <select id="filterStatus" style="padding:10px;border-radius:8px;border:1.5px solid var(--border);background:#f8fafc;">
+                <option value="">All Statuses</option>
+                <option value="applied">Applied</option>
+                <option value="review">Under Review</option>
+                <option value="shortlisted">Shortlisted</option>
+                <option value="interview">Interview</option>
+                <option value="accepted">Accepted</option>
+                <option value="rejected">Rejected</option>
+            </select>
+        </div>
+
+        <div class="panel">
+            <div class="table-wrap">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Candidate</th>
+                            <th>Job</th>
+                            <th>Company</th>
+                            <th>AI Score</th>
+                            <th>Status</th>
+                            <th>Applied</th>
+                        </tr>
+                    </thead>
+                    <tbody id="appsBody">
+                        <tr><td colspan="7" class="empty">Loading...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+<script src="../js/csrf.js"></script>
+<script src="../js/admin-applications.js"></script>
+</body>
+</html>

@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard | IntelliHire</title>
+    <link rel="stylesheet" href="../css/dashboard.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+    <div class="app-layout">
+
+        <!-- ================= SIDEBAR ================= -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-logo">
+                <span class="logo-mark">IHR</span>
+                <span class="logo-text">IntelliHire</span>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="applicantdash.html" class="nav-item active">
+                    <span class="nav-icon">🏠</span> Dashboard
+                </a>
+                <a href="profile.html" class="nav-item">
+                    <span class="nav-icon">👤</span> My Profile
+                </a>
+                <a href="cv.html" class="nav-item">
+                    <span class="nav-icon">📄</span> My CV
+                </a>
+                <a href="find-jobs.html" class="nav-item">
+                    <span class="nav-icon">🔍</span> Find Jobs
+                </a>
+                <a href="applications.html" class="nav-item">
+                    <span class="nav-icon">📋</span> My Applications
+                </a>
+                <a href="notifications.html" class="nav-item">
+                    <span class="nav-icon">🔔</span> Notifications
+                    <span class="badge-count" id="notifCount">0</span>
+                </a>
+                <a href="../php/logout.php" class="nav-item logout">
+                    <span class="nav-icon">🚪</span> Logout
+                </a>
+            </nav>
+        </aside>
+
+        <!-- ================= MAIN CONTENT ================= -->
+        <main class="main-content">
+
+            <!-- Top Bar -->
+            <header class="topbar">
+                <button class="menu-toggle" id="menuToggle">☰</button>
+                <h2>Dashboard</h2>
+                <div class="user-info">
+                    <span id="userName">Loading...</span>
+                    <div class="avatar" id="userAvatar">A</div>
+                </div>
+            </header>
+
+            <!-- Welcome Banner -->
+            <section class="welcome-banner">
+                <div>
+                    <h1>Welcome back, <span id="welcomeName">Applicant</span> 👋</h1>
+                    <p>Here's a snapshot of your job search progress.</p>
+                </div>
+            </section>
+
+            <!-- Stat Cards -->
+            <section class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon blue">📨</div>
+                    <div>
+                        <h3 id="statApplications">0</h3>
+                        <p>Total Applications</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon yellow">⏳</div>
+                    <div>
+                        <h3 id="statPending">0</h3>
+                        <p>Pending</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon green">✅</div>
+                    <div>
+                        <h3 id="statShortlisted">0</h3>
+                        <p>Shortlisted</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon purple">💼</div>
+                    <div>
+                        <h3 id="statAvailableJobs">0</h3>
+                        <p>Available Jobs</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Profile Completion + CV Status -->
+            <section class="progress-grid">
+
+                <!-- Profile Completion -->
+                <div class="panel">
+                    <div class="panel-head">
+                        <h3>Profile Completion</h3>
+                        <a href="profile.html" class="link">Edit →</a>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="profileProgressFill" style="width:0%"></div>
+                    </div>
+                    <p class="progress-text">
+                        <strong id="profilePercent">0%</strong> complete
+                    </p>
+                    <ul class="checklist" id="profileChecklist">
+                        <li data-field="full_name">✅ Full name</li>
+                        <li data-field="email">✅ Email</li>
+                        <li data-field="phone">✅ Phone</li>
+                        <li data-field="location">⬜ Location</li>
+                        <li data-field="university">⬜ University</li>
+                        <li data-field="course">⬜ Course</li>
+                        <li data-field="skills">⬜ Skills</li>
+                    </ul>
+                </div>
+
+                <!-- CV Status -->
+                <div class="panel">
+                    <div class="panel-head">
+                        <h3>CV Status</h3>
+                        <a href="cv.html" class="link">Manage →</a>
+                    </div>
+                    <div id="cvStatusBox" class="cv-status">
+                        <p>Loading...</p>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- Recent Applications -->
+            <section class="panel">
+                <div class="panel-head">
+                    <h3>Recent Applications</h3>
+                    <a href="applications.html" class="link">View all →</a>
+                </div>
+
+                <div class="table-wrap">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Job Title</th>
+                                <th>Company</th>
+                                <th>Applied</th>
+                                <th>Status</th>
+                                <th>Match</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentAppsBody">
+                            <tr><td colspan="5" class="empty">Loading applications...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Available Jobs Preview -->
+            <section class="panel">
+                <div class="panel-head">
+                    <h3>Recommended Jobs</h3>
+                    <a href="find-jobs.html" class="link">Browse all →</a>
+                </div>
+                <div class="jobs-grid" id="jobsGrid">
+                    <p class="empty">Loading jobs...</p>
+                </div>
+            </section>
+
+        </main>
+    </div>
+    <script src="../js/csrf.js"></script>
+    <script src="../js/dashboard.js"></script>
+</body>
+</html>

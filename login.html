@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login | IntelliHire (IHR)</title>
+    <link rel="stylesheet" href="css/login.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+    <!-- ================= NAVBAR ================= -->
+    <header class="navbar">
+        <div class="container nav-container">
+            <a href="index.html" class="logo">
+                <span class="logo-mark">IHR</span>
+                <span class="logo-text">IntelliHire</span>
+            </a>
+            <a href="register.html" class="btn btn-outline">Register</a>
+        </div>
+    </header>
+
+    <!-- ================= LOGIN ================= -->
+    <main class="login-wrapper">
+        <div class="login-card">
+            <div class="login-head">
+                <h1>Welcome Back</h1>
+                <p>Log in to your IntelliHire account to continue.</p>
+            </div>
+
+            <!-- Alert box -->
+            <div id="alertBox" class="alert" style="display:none;"></div>
+
+            <form id="loginForm" novalidate>
+
+                <div class="form-group">
+                    <label for="email">Email Address <span class="req">*</span></label>
+                    <input type="email" id="email" name="email" placeholder="you@example.com" required />
+                    <small class="error" data-for="email"></small>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password <span class="req">*</span></label>
+                    <div class="password-wrap">
+                        <input type="password" id="password" name="password" placeholder="Enter your password" required />
+                        <button type="button" class="toggle-pass" id="togglePass" aria-label="Show password">👁</button>
+                    </div>
+                    <small class="error" data-for="password"></small>
+                </div>
+
+                <div class="form-options">
+                    <label class="remember">
+                        <input type="checkbox" id="remember" name="remember" />
+                        <span>Remember me</span>
+                    </label>
+                    <a href="forgot-password.html" class="forgot-link">Forgot password?</a>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block" id="submitBtn">
+                    Login
+                </button>
+
+                <p class="register-link">
+                    Don't have an account? <a href="register.html">Register</a>
+                </p>
+            </form>
+        </div>
+    </main>
+
+    <script src="js/csrf.js"></script>
+    <script src="js/login.js"></script>
+</body>
+</body>
+</html>

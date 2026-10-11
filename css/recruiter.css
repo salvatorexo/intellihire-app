@@ -1,0 +1,228 @@
+/* ================= RECRUITER EXTRAS ================= */
+
+.stat-icon.red { background: #fee2e2; }
+
+/* Top candidates list */
+.candidate-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+}
+.candidate-row:last-child { border-bottom: none; }
+
+.candidate-rank {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--gray);
+    flex-shrink: 0;
+}
+.candidate-rank.gold   { background: #fef3c7; color: #92400e; }
+.candidate-rank.silver { background: #e5e7eb; color: #374151; }
+.candidate-rank.bronze { background: #fed7aa; color: #9a3412; }
+
+.candidate-info { flex: 1; min-width: 0; }
+.candidate-info strong {
+    display: block;
+    font-size: 0.92rem;
+    color: var(--dark);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.candidate-info small {
+    color: var(--gray);
+    font-size: 0.78rem;
+}
+
+.candidate-score {
+    font-weight: 700;
+    font-size: 1rem;
+    flex-shrink: 0;
+}
+.score-strong { color: var(--success); }
+.score-good   { color: #d97706; }
+.score-weak   { color: var(--danger); }
+
+/* ================= POST VACANCY FORM ================= */
+.vacancy-form {
+    background: var(--white);
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    padding: 30px;
+    max-width: 900px;
+}
+.vacancy-form .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+}
+.vacancy-form .form-group { display: flex; flex-direction: column; }
+.vacancy-form .form-group.full { grid-column: 1 / -1; }
+.vacancy-form label {
+    font-size: 0.88rem;
+    font-weight: 500;
+    margin-bottom: 6px;
+}
+.vacancy-form input,
+.vacancy-form textarea,
+.vacancy-form select {
+    padding: 11px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.92rem;
+    background: #f8fafc;
+}
+.vacancy-form input:focus,
+.vacancy-form textarea:focus,
+.vacancy-form select:focus {
+    outline: none;
+    border-color: var(--primary);
+    background: var(--white);
+}
+.vacancy-form textarea {
+    resize: vertical;
+    min-height: 90px;
+}
+.vacancy-form .req { color: var(--danger); }
+
+/* ================= VACANCY CARDS ================= */
+.vacancy-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 18px;
+}
+.vacancy-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: all 0.2s;
+}
+.vacancy-card:hover {
+    border-color: var(--primary);
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+}
+.vacancy-card h3 {
+    font-size: 1.05rem;
+    color: var(--dark);
+}
+.vacancy-card .status-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 50px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    align-self: flex-start;
+}
+.status-badge.open   { background: #dcfce7; color: #166534; }
+.status-badge.closed { background: #fee2e2; color: #991b1b; }
+
+.vacancy-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 0.78rem;
+    color: var(--gray);
+}
+.vacancy-meta span {
+    background: var(--light);
+    padding: 4px 10px;
+    border-radius: 50px;
+}
+.vacancy-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+.vacancy-actions button {
+    flex: 1;
+    padding: 8px;
+    font-size: 0.82rem;
+}
+
+/* ================= AI SCREENING DETAILS ================= */
+.screening-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px;
+    margin-bottom: 22px;
+}
+.screening-item {
+    background: #f8fafc;
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+    border: 1px solid var(--border);
+}
+.screening-item .label {
+    font-size: 0.8rem;
+    color: var(--gray);
+    margin-bottom: 6px;
+}
+.screening-item .value {
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+.screening-item .value.high { color: var(--success); }
+.screening-item .value.mid  { color: #d97706; }
+.screening-item .value.low  { color: var(--danger); }
+
+.overall-score-box {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: var(--white);
+    border-radius: 14px;
+    padding: 26px;
+    text-align: center;
+    margin-bottom: 22px;
+}
+.overall-score-box .score {
+    font-size: 3rem;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 6px;
+}
+.overall-score-box .label {
+    font-size: 0.9rem;
+    opacity: 0.9;
+}
+.overall-score-box .recommendation {
+    display: inline-block;
+    margin-top: 14px;
+    padding: 6px 20px;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    background: rgba(255,255,255,0.2);
+}
+.overall-score-box .recommendation.strong { background: #22c55e; }
+.overall-score-box .recommendation.good   { background: #eab308; color: #422006; }
+.overall-score-box .recommendation.weak   { background: #ef4444; }
+
+/* Status dropdown inline */
+.status-select {
+    padding: 6px 10px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.82rem;
+    background: var(--white);
+    cursor: pointer;
+}
+.status-select:focus { outline: none; border-color: var(--primary); }
+
+@media (max-width: 800px) {
+    .vacancy-form .form-grid { grid-template-columns: 1fr; }
+}

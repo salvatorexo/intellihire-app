@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Notifications | IntelliHire</title>
+    <link rel="stylesheet" href="../css/dashboard.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+        .notif-item {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 18px 20px;
+            margin-bottom: 12px;
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+            transition: 0.2s;
+        }
+        .notif-item.unread {
+            border-left: 4px solid var(--primary);
+            background: #f0f7ff;
+        }
+        .notif-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            flex-shrink: 0;
+        }
+        .notif-body { flex: 1; }
+        .notif-body p {
+            font-size: 0.92rem;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+        .notif-body small {
+            color: var(--gray);
+            font-size: 0.78rem;
+        }
+    </style>
+</head>
+<body>
+<div class="app-layout">
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo"><span class="logo-mark">IHR</span><span class="logo-text">IntelliHire</span></div>
+        <nav class="sidebar-nav">
+            <a href="applicantdash.html" class="nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
+            <a href="profile.html" class="nav-item"><span class="nav-icon">👤</span> My Profile</a>
+            <a href="cv.html" class="nav-item"><span class="nav-icon">📄</span> My CV</a>
+            <a href="find-jobs.html" class="nav-item"><span class="nav-icon">🔍</span> Find Jobs</a>
+            <a href="applications.html" class="nav-item"><span class="nav-icon">📋</span> My Applications</a>
+            <a href="notifications.html" class="nav-item active"><span class="nav-icon">🔔</span> Notifications</a>
+            <a href="../php/logout.php" class="nav-item logout"><span class="nav-icon">🚪</span> Logout</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <button class="menu-toggle" id="menuToggle">☰</button>
+            <h2>Notifications</h2>
+            <button class="btn btn-outline" id="markAllBtn">Mark all read</button>
+        </header>
+
+        <div id="notifList">
+            <p class="empty">Loading notifications...</p>
+        </div>
+    </main>
+</div>
+<script src="../js/csrf.js"></script>
+<script src="../js/notifications.js"></script>
+</body>
+</html>

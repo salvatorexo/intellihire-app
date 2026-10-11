@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register | IntelliHire (IHR)</title>
+    
+    <link rel="stylesheet" href="css/register.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+    <!-- ================= NAVBAR ================= -->
+    <header class="navbar">
+        <div class="container nav-container">
+            <a href="index.html" class="logo">
+                <span class="logo-mark">IHR</span>
+                <span class="logo-text">IntelliHire</span>
+            </a>
+            <a href="login.html" class="btn btn-outline">Login</a>
+        </div>
+    </header>
+
+    <!-- ================= REGISTER ================= -->
+    <main class="register-wrapper">
+        <div class="register-card">
+            <div class="register-head">
+                <h1>Create Your Account</h1>
+                <p>Join IntelliHire and start your journey today.</p>
+            </div>
+
+            <!-- Alert box for messages -->
+            <div id="alertBox" class="alert" style="display:none;"></div>
+
+            <form id="registerForm" novalidate>
+
+                <!-- ============ Account Type ============ -->
+                <div class="form-group">
+                    <label>Account Type <span class="req">*</span></label>
+                    <div class="role-toggle">
+                        <label class="role-option">
+                            <input type="radio" name="account_type" value="applicant" checked />
+                            <span>👤 Applicant</span>
+                        </label>
+                        <label class="role-option">
+                            <input type="radio" name="account_type" value="recruiter" />
+                            <span>🏢 Recruiter</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- ============ Common Fields ============ -->
+                <div class="form-group">
+                    <label for="fullName">Full Name <span class="req">*</span></label>
+                    <input type="text" id="fullName" name="full_name" placeholder="John Doe" required />
+                    <small class="error" data-for="fullName"></small>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Address <span class="req">*</span></label>
+                    <input type="email" id="email" name="email" placeholder="you@example.com" required />
+                    <small class="error" data-for="email"></small>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Phone Number <span class="req">*</span></label>
+                    <input type="tel" id="phone" name="phone" placeholder="+254 7XX XXX XXX" required />
+                    <small class="error" data-for="phone"></small>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="password">Password <span class="req">*</span></label>
+                        <input type="password" id="password" name="password" placeholder="Min. 8 characters" required />
+                        <small class="error" data-for="password"></small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm Password <span class="req">*</span></label>
+                        <input type="password" id="confirmPassword" name="confirm_password" placeholder="Re-enter password" required />
+                        <small class="error" data-for="confirmPassword"></small>
+                    </div>
+                </div>
+
+                <!-- ============ Applicant Fields ============ -->
+                <div id="applicantFields" class="role-fields">
+                    <h3 class="section-title">Applicant Information</h3>
+
+                    <div class="form-group">
+                        <label for="university">University / College <span class="req">*</span></label>
+                        <input type="text" id="university" name="university" placeholder="e.g. University of Nairobi" />
+                        <small class="error" data-for="university"></small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="course">Course / Field of Study <span class="req">*</span></label>
+                        <input type="text" id="course" name="course" placeholder="e.g. Computer Science" />
+                        <small class="error" data-for="course"></small>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="gradYear">Graduation Year <span class="req">*</span></label>
+                            <input type="number" id="gradYear" name="graduation_year" placeholder="2025" min="1980" max="2100" />
+                            <small class="error" data-for="gradYear"></small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="applicantLocation">Location <span class="req">*</span></label>
+                            <input type="text" id="applicantLocation" name="location" placeholder="e.g. Nairobi, Kenya" />
+                            <small class="error" data-for="applicantLocation"></small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ============ Recruiter Fields ============ -->
+                <div id="recruiterFields" class="role-fields" style="display:none;">
+                    <h3 class="section-title">Company Information</h3>
+
+                    <div class="form-group">
+                        <label for="companyName">Company Name <span class="req">*</span></label>
+                        <input type="text" id="companyName" name="company_name" placeholder="e.g. TechCorp Ltd" />
+                        <small class="error" data-for="companyName"></small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="companyEmail">Company Email <span class="req">*</span></label>
+                        <input type="email" id="companyEmail" name="company_email" placeholder="hr@company.com" />
+                        <small class="error" data-for="companyEmail"></small>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="companyPhone">Company Phone <span class="req">*</span></label>
+                            <input type="tel" id="companyPhone" name="company_phone" placeholder="+254 20 XXX XXXX" />
+                            <small class="error" data-for="companyPhone"></small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="companyLocation">Company Location <span class="req">*</span></label>
+                            <input type="text" id="companyLocation" name="company_location" placeholder="e.g. Westlands, Nairobi" />
+                            <small class="error" data-for="companyLocation"></small>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="industry">Industry / Business Type <span class="req">*</span></label>
+                        <select id="industry" name="industry">
+                            <option value="">-- Select industry --</option>
+                            <option value="Technology">Technology / IT</option>
+                            <option value="Finance">Finance / Banking</option>
+                            <option value="Healthcare">Healthcare</option>
+                            <option value="Education">Education</option>
+                            <option value="Retail">Retail / E-commerce</option>
+                            <option value="Manufacturing">Manufacturing</option>
+                            <option value="Construction">Construction</option>
+                            <option value="Agriculture">Agriculture</option>
+                            <option value="Media">Media / Entertainment</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <small class="error" data-for="industry"></small>
+                    </div>
+                </div>
+
+                <!-- ============ Submit ============ -->
+                <button type="submit" class="btn btn-primary btn-block" id="submitBtn">
+                    Create Account
+                </button>
+
+                <p class="login-link">
+                    Already have an account? <a href="login.html">Login</a>
+                </p>
+            </form>
+        </div>
+    </main>
+    <script src="../js/csrf.js"></script>
+    <script src="js/register.js"></script>
+    <script>
+    // Pre-select role from URL parameter
+    (function() {
+        const params = new URLSearchParams(window.location.search);
+        const role = params.get('role');
+        if (role === 'applicant' || role === 'recruiter') {
+            const radio = document.querySelector(`input[name="account_type"][value="${role}"]`);
+            if (radio) {
+                radio.checked = true;
+                radio.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+        }
+    })();
+</script>
+</body>
+</html>

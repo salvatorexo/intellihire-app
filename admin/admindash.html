@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard | IntelliHire</title>
+    <link rel="stylesheet" href="../css/dashboard.css" />
+    <link rel="stylesheet" href="../css/admin.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+<div class="app-layout">
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <span class="logo-mark">IHR</span>
+            <span class="logo-text">IntelliHire</span>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="admindash.html" class="nav-item active"><span class="nav-icon">🏠</span> Dashboard</a>
+            <a href="users.html" class="nav-item"><span class="nav-icon">👥</span> Users</a>
+            <a href="companies.html" class="nav-item"><span class="nav-icon">🏢</span> Companies</a>
+            <a href="vacancies.html" class="nav-item"><span class="nav-icon">💼</span> Vacancies</a>
+            <a href="applications.html" class="nav-item"><span class="nav-icon">📋</span> Applications</a>
+            <a href="reports.html" class="nav-item"><span class="nav-icon">📊</span> Reports</a>
+            <a href="../php/logout.php" class="nav-item logout"><span class="nav-icon">🚪</span> Logout</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <button class="menu-toggle" id="menuToggle">☰</button>
+            <h2>Admin Dashboard</h2>
+            <div class="user-info">
+                <span id="userName">Loading...</span>
+                <div class="avatar" id="userAvatar">A</div>
+            </div>
+        </header>
+
+        <section class="welcome-banner" style="background:linear-gradient(135deg,#0f172a,#1e293b);">
+            <div>
+                <h1>Welcome, <span id="welcomeName">Admin</span> 🛡️</h1>
+                <p>Full system overview — monitor all activity across IntelliHire.</p>
+            </div>
+        </section>
+
+        <!-- Primary Stats -->
+        <section class="stats-grid">
+            <div class="stat-card"><div class="stat-icon blue">👤</div><div><h3 id="statApplicants">0</h3><p>Total Applicants</p></div></div>
+            <div class="stat-card"><div class="stat-icon purple">🏢</div><div><h3 id="statRecruiters">0</h3><p>Total Recruiters</p></div></div>
+            <div class="stat-card"><div class="stat-icon yellow">🏛</div><div><h3 id="statCompanies">0</h3><p>Total Companies</p></div></div>
+            <div class="stat-card"><div class="stat-icon green">💼</div><div><h3 id="statVacancies">0</h3><p>Total Vacancies</p></div></div>
+            <div class="stat-card"><div class="stat-icon red">📨</div><div><h3 id="statApplications">0</h3><p>Total Applications</p></div></div>
+            <div class="stat-card"><div class="stat-icon green">⭐</div><div><h3 id="statShortlisted">0</h3><p>Shortlisted</p></div></div>
+            <div class="stat-card"><div class="stat-icon purple">🎤</div><div><h3 id="statInterviews">0</h3><p>Interviews</p></div></div>
+            <div class="stat-card"><div class="stat-icon blue">🟢</div><div><h3 id="statActiveVacancies">0</h3><p>Active Vacancies</p></div></div>
+        </section>
+
+        <!-- Charts + Recent Activity -->
+        <section class="progress-grid">
+            <div class="panel">
+                <div class="panel-head">
+                    <h3>Applications Trend (Last 7 Days)</h3>
+                </div>
+                <canvas id="trendChart" height="200"></canvas>
+            </div>
+
+            <div class="panel">
+                <div class="panel-head">
+                    <h3>Status Breakdown</h3>
+                </div>
+                <canvas id="statusChart" height="200"></canvas>
+            </div>
+        </section>
+
+        <!-- Recent signups + recent applications -->
+        <section class="progress-grid">
+            <div class="panel">
+                <div class="panel-head"><h3>Recent Signups</h3><a href="users.html" class="link">View all →</a></div>
+                <div id="recentUsers"><p class="empty">Loading...</p></div>
+            </div>
+            <div class="panel">
+                <div class="panel-head"><h3>Recent Applications</h3><a href="applications.html" class="link">View all →</a></div>
+                <div id="recentApplications"><p class="empty">Loading...</p></div>
+            </div>
+        </section>
+
+    </main>
+</div>
+<script src="../js/csrf.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="../js/admin-dash.js"></script>
+</body>
+</html>

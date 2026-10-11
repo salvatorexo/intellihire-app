@@ -1,0 +1,51 @@
+.stat-icon.red    { background: #fee2e2; }
+.stat-icon.green  { background: #dcfce7; }
+.stat-icon.purple { background: #ede9fe; }
+.stat-icon.blue   { background: #dbeafe; }
+.stat-icon.yellow { background: #fef3c7; }
+
+.activity-item {
+    display: flex;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    align-items: center;
+}
+.activity-item:last-child { border-bottom: none; }
+.activity-avatar {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: var(--light);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 600; font-size: 0.85rem;
+    color: var(--gray);
+    flex-shrink: 0;
+}
+.activity-info { flex: 1; min-width: 0; }
+.activity-info strong {
+    display: block; font-size: 0.9rem;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.activity-info small { color: var(--gray); font-size: 0.78rem; }
+
+/* Admin tables */
+.admin-table-actions button {
+    padding: 5px 10px;
+    font-size: 0.78rem;
+    margin-right: 4px;
+}
+.admin-search-bar {
+    display: flex; gap: 10px;
+    margin-bottom: 16px;
+}
+.admin-search-bar input {
+    flex: 1;
+    padding: 10px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-family: inherit;
+    background: #f8fafc;
+}
+.admin-search-bar input:focus {
+    outline: none; border-color: var(--primary); background: var(--white);
+}

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Post Vacancy | IntelliHire</title>
+    <link rel="stylesheet" href="../css/dashboard.css" />
+    <link rel="stylesheet" href="../css/recruiter.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+<div class="app-layout">
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo"><span class="logo-mark">IHR</span><span class="logo-text">IntelliHire</span></div>
+        <nav class="sidebar-nav">
+            <a href="recruiterdash.html" class="nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
+            <a href="company.html" class="nav-item"><span class="nav-icon">🏢</span> Company Profile</a>
+            <a href="my-vacancies.html" class="nav-item"><span class="nav-icon">💼</span> My Vacancies</a>
+            <a href="post-vacancy.html" class="nav-item active"><span class="nav-icon">➕</span> Post Vacancy</a>
+            <a href="applications.html" class="nav-item"><span class="nav-icon">📋</span> Applications</a>
+            <a href="applications.html?filter=shortlisted" class="nav-item"><span class="nav-icon">⭐</span> Shortlisted</a>
+            <a href="applications.html?filter=interview" class="nav-item"><span class="nav-icon">🎤</span> Interviews</a>
+            <a href="reports.html" class="nav-item"><span class="nav-icon">📊</span> Reports</a>
+            <a href="../php/logout.php" class="nav-item logout"><span class="nav-icon">🚪</span> Logout</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <button class="menu-toggle" id="menuToggle">☰</button>
+            <h2>Post a New Vacancy</h2>
+        </header>
+
+        <div id="alertBox" class="alert" style="display:none;"></div>
+
+        <form id="vacancyForm" class="vacancy-form">
+            <div class="form-grid">
+                <div class="form-group full">
+                    <label>Job Title <span class="req">*</span></label>
+                    <input type="text" id="title" required placeholder="e.g. Junior Web Developer" />
+                </div>
+
+                <div class="form-group full">
+                    <label>Job Description <span class="req">*</span></label>
+                    <textarea id="description" required placeholder="Describe the role, responsibilities, team..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Location <span class="req">*</span></label>
+                    <input type="text" id="location" required placeholder="e.g. Nairobi, Kenya" />
+                </div>
+
+                <div class="form-group">
+                    <label>Employment Type <span class="req">*</span></label>
+                    <select id="job_type" required>
+                        <option value="Full-time">Full-time</option>
+                        <option value="Part-time">Part-time</option>
+                        <option value="Contract">Contract</option>
+                        <option value="Internship">Internship</option>
+                        <option value="Remote">Remote</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Salary Range (optional)</label>
+                    <input type="text" id="salary_range" placeholder="e.g. KES 50,000 – 80,000" />
+                </div>
+
+                <div class="form-group">
+                    <label>Application Deadline <span class="req">*</span></label>
+                    <input type="date" id="deadline" required />
+                </div>
+
+                <div class="form-group full">
+                    <label>Required Education</label>
+                    <input type="text" id="education_requirements" placeholder="e.g. Bachelor in Computer Science" />
+                </div>
+
+                <div class="form-group full">
+                    <label>Required Experience</label>
+                    <textarea id="requirements" placeholder="e.g. 1+ year experience with PHP and MySQL"></textarea>
+                </div>
+
+                <div class="form-group full">
+                    <label>Required Skills <span class="req">*</span></label>
+                    <input type="text" id="skills" required placeholder="e.g. PHP, MySQL, JavaScript (comma separated)" />
+                </div>
+
+                <div class="form-group full">
+                    <label>Preferred Skills</label>
+                    <input type="text" id="preferred_skills" placeholder="e.g. React, Docker, Git (comma separated)" />
+                </div>
+            </div>
+
+            <div style="margin-top:24px; display:flex; gap:12px;">
+                <button type="submit" class="btn btn-primary" id="postBtn">Post Vacancy</button>
+                <a href="recruiterdash.html" class="btn btn-outline">Cancel</a>
+            </div>
+        </form>
+    </main>
+</div>
+<script src="../js/csrf.js"></script>
+<script src="../js/post-vacancy.js"></script>
+</body>
+</html>

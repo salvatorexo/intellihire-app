@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Candidate Detail | IntelliHire</title>
+    <link rel="stylesheet" href="../css/dashboard.css" />
+    <link rel="stylesheet" href="../css/recruiter.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+<div class="app-layout">
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo"><span class="logo-mark">IHR</span><span class="logo-text">IntelliHire</span></div>
+        <nav class="sidebar-nav">
+            <a href="recruiterdash.html" class="nav-item"><span class="nav-icon">🏠</span> Dashboard</a>
+            <a href="company.html" class="nav-item"><span class="nav-icon">🏢</span> Company Profile</a>
+            <a href="my-vacancies.html" class="nav-item"><span class="nav-icon">💼</span> My Vacancies</a>
+            <a href="post-vacancy.html" class="nav-item"><span class="nav-icon">➕</span> Post Vacancy</a>
+            <a href="applications.html" class="nav-item active"><span class="nav-icon">📋</span> Applications</a>
+            <a href="applications.html?filter=shortlisted" class="nav-item"><span class="nav-icon">⭐</span> Shortlisted</a>
+            <a href="applications.html?filter=interview" class="nav-item"><span class="nav-icon">🎤</span> Interviews</a>
+            <a href="reports.html" class="nav-item"><span class="nav-icon">📊</span> Reports</a>
+            <a href="../php/logout.php" class="nav-item logout"><span class="nav-icon">🚪</span> Logout</a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <header class="topbar">
+            <button class="menu-toggle" id="menuToggle">☰</button>
+            <h2>Candidate Screening Details 🤖</h2>
+            <a href="applications.html" class="btn btn-outline">← Back</a>
+        </header>
+
+        <div id="content">
+            <p class="empty">Loading candidate...</p>
+        </div>
+    </main>
+</div>
+<script src="../js/csrf.js"></script>
+<script src="../js/candidate.js"></script>
+</body>
+</html>

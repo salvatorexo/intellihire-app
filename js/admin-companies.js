@@ -1,3 +1,9 @@
+/* =========================================================
+   IntelliHire - Admin: Manage Companies
+   Uses admin-delete-company.php so it deletes BOTH the
+   recruiters row AND the users row.
+   ========================================================= */
+
 let allCompanies = [];
 const alertBox = document.getElementById('alertBox');
 
@@ -50,9 +56,9 @@ function render() {
 }
 
 async function deleteCompany(userId, name) {
-    if (!confirm(`Delete company "${name}" and its recruiter account? All their vacancies and applications will also be removed.`)) return;
+    if (!confirm(`Delete company "${name}" and its recruiter account?\n\nAll their vacancies and applications will also be removed.`)) return;
     try {
-        const res = await fetch('../php/admin-delete-user.php', {
+        const res = await fetch('../php/admin-delete-company.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id: userId })
@@ -64,7 +70,9 @@ async function deleteCompany(userId, name) {
         } else {
             showAlert(data.message || 'Delete failed.');
         }
-    } catch (err) { showAlert('Network error.'); }
+    } catch (err) {
+        showAlert('Network error.');
+    }
 }
 
 document.getElementById('search').addEventListener('input', render);

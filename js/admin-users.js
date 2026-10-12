@@ -1,5 +1,6 @@
 /* =========================================================
    IntelliHire - Admin: Manage Users
+   Uses admin-delete-user.php (deletes ONLY from users table).
    ========================================================= */
 
 let allUsers = [];

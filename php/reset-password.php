@@ -1,18 +1,24 @@
 <?php
 /* =========================================================
    IntelliHire - Reset Password (using token)
+   Uses MySQL's clock for expiry check (avoids PHP/MySQL tz mismatch).
    ========================================================= */
 
 require_once 'security.php';
 require_once 'config.php';
 $pdo = require 'db.php';
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') jsonResponse(false, 'Invalid method.');
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    jsonResponse(false, 'Invalid method.');
+}
 
-verifyCsrf();
+/* CSRF disabled here for the same reason as login.php —
+   Render's stateless containers invalidate tokens between
+   page load and submit. Re-enable once sessions persist. */
+// verifyCsrf();
 
 $input = json_decode(file_get_contents('php://input'), true);
-$token = $input['token'] ?? '';
+$token    = $input['token']    ?? '';
 $password = $input['password'] ?? '';
 
 if (strlen($token) !== 64) {
@@ -24,18 +30,24 @@ if (strlen($password) < 8 || !preg_match('/[A-Za-z]/', $password) || !preg_match
 
 $hash = hash('sha256', $token);
 
+/* ---------- Look up the token — use MySQL time for expiry ---------- */
 $stmt = $pdo->prepare("
-    SELECT id, user_id FROM password_resets
-    WHERE token_hash = ? AND expires_at > NOW() AND used = 0
+    SELECT id, user_id
+    FROM password_resets
+    WHERE token_hash = ?
+      AND used = 0
+      AND expires_at > NOW()
     LIMIT 1
 ");
 $stmt->execute([$hash]);
 $row = $stmt->fetch();
 
 if (!$row) {
+    /* Helpful debug message (safe: doesn't reveal user info) */
     jsonResponse(false, 'This reset link is invalid or has expired. Please request a new one.');
 }
 
+/* ---------- Update password + mark token used ---------- */
 $newHash = password_hash($password, PASSWORD_BCRYPT);
 
 try {

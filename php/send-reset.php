@@ -3,7 +3,7 @@
    IntelliHire - Send Password Reset Link
    - Works for ANY registered user (applicant, recruiter, admin)
    - Always returns a generic message (prevents email enumeration)
-   - Uses MySQL's clock for the expiry (avoids PHP/MySQL tz mismatch)
+   - Uses MySQL's clock for expiry (avoids PHP/MySQL tz mismatch)
    - Falls back to showing the link on screen if SMTP fails
    ========================================================= */
 
@@ -25,7 +25,9 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     jsonResponse(false, 'Invalid method.');
 }
 
-verifyCsrf();
+/* CSRF disabled for Render (stateless sessions).
+   Re-enable once session persistence is configured. */
+// verifyCsrf();
 
 $input = json_decode(file_get_contents('php://input'), true);
 $email = trim($input['email'] ?? '');
@@ -122,6 +124,7 @@ try {
     $mail->SMTPSecure = MAIL_ENCRYPTION;
     $mail->Port       = MAIL_PORT;
     $mail->CharSet    = 'UTF-8';
+    $mail->Timeout    = 10;   // ⚠️ prevents Render's request from hanging
 
     $mail->setFrom(MAIL_FROM, MAIL_FROM_NAME);
     $mail->addAddress($email, $user['full_name']);
@@ -144,8 +147,8 @@ if ($emailSent) {
     jsonResponse(true, $genericMessage);
 } else {
     /*
-     * Fallback: SMTP failed. Show the link on screen so the
-     * user can still reset their password (great for demos).
+     * Fallback: SMTP failed (common on Render free tier).
+     * Show the link on screen so the user can still reset.
      */
     jsonResponse(true, "We couldn't email you, but here is your reset link (demo fallback):", [
         'demo_link'  => $link,

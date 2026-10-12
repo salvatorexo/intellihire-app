@@ -2,12 +2,16 @@
 /* =========================================================
    IntelliHire - Registration Handler
    Handles both Applicant and Recruiter registration
-   Passwords are hashed using password_hash() (bcrypt)
+   Passwords hashed with password_hash() (bcrypt)
    ========================================================= */
 
+require_once 'security.php';
 require_once 'config.php';
 
-// Only accept POST
+$pdo = require 'db.php';       // 👈 returns PDO object
+
+// verifyCsrf();  // Disabled for Render stateless sessions
+
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     jsonResponse(false, 'Invalid request method.');
 }
@@ -50,14 +54,14 @@ if ($stmt->fetch()) {
     jsonResponse(false, 'An account with this email already exists.');
 }
 
-// ---- Hash the password (bcrypt) ----
+// ---- Hash the password ----
 $password_hash = password_hash($password, PASSWORD_BCRYPT);
 
 // ---- Begin transaction ----
 try {
     $pdo->beginTransaction();
 
-    // ---- Insert into users table ----
+    // Insert into users table
     $stmt = $pdo->prepare("
         INSERT INTO users (full_name, email, phone, password_hash, account_type, created_at)
         VALUES (?, ?, ?, ?, ?, NOW())
@@ -65,7 +69,7 @@ try {
     $stmt->execute([$full_name, $email, $phone, $password_hash, $account_type]);
     $user_id = $pdo->lastInsertId();
 
-    // ---- Insert role-specific data ----
+    // Insert role-specific data
     if ($account_type === 'applicant') {
         $university      = trim($input['university'] ?? '');
         $course          = trim($input['course'] ?? '');
@@ -112,6 +116,8 @@ try {
     }
 
     $pdo->commit();
+
+    auditLog($pdo, 'register_success', "New {$account_type}: {$email}");
 
     jsonResponse(true, 'Account created successfully! Redirecting to login...', [
         'user_id' => $user_id,

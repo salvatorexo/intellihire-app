@@ -1,11 +1,14 @@
 <?php
 /* =========================================================
-   IntelliHire - Login Handler (Render-compatible)
+   IntelliHire - Login Handler (Optimized)
+   - Session stays open so we can write $_SESSION on success
    - Rate limited
    - Session regenerated on success
    - Audit logged
    - CSRF temporarily disabled for Render stateless sessions
    ========================================================= */
+
+define('KEEP_SESSION_OPEN', true);
 
 require_once 'security.php';
 require_once 'auth.php';
@@ -21,8 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 /* ---------------------------------------------------------
    CSRF verification — temporarily disabled
    Reason: Render stateless sessions invalidate tokens between
-   the token fetch and the login submit. Re-enable later once
-   session.save_path is configured for persistence.
+   the token fetch and the login submit.
    --------------------------------------------------------- */
 // verifyCsrf();
 
@@ -40,14 +42,14 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
     jsonResponse(false, 'Invalid email format.');
 }
 
-/* Rate limit check */
+/* ---------- Rate limit check ---------- */
 list($allowed, $msg) = checkRateLimit($pdo, $email);
 if (!$allowed) {
     auditLog($pdo, 'login_rate_limited', "Email: $email");
     jsonResponse(false, $msg);
 }
 
-/* Fetch user */
+/* ---------- Fetch user ---------- */
 $stmt = $pdo->prepare("
     SELECT id, full_name, email, password_hash, account_type
     FROM users WHERE email = ? LIMIT 1
@@ -61,7 +63,7 @@ if (!$user || !password_verify($password, $user['password_hash'])) {
     jsonResponse(false, 'Invalid email or password.');
 }
 
-/* Success — clear attempts, regenerate session */
+/* ---------- Success ---------- */
 clearAttempts($pdo, $email);
 regenerateSession();
 
@@ -92,7 +94,7 @@ switch ($user['account_type']) {
 jsonResponse(true, 'Login successful! Redirecting...', [
     'role'     => $user['account_type'],
     'redirect' => $redirect,
-    'csrf'     => csrfToken(),       // refresh token for the new session
+    'csrf'     => csrfToken(),
     'user'     => [
         'id'        => $user['id'],
         'full_name' => $user['full_name'],

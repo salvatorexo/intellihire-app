@@ -1,5 +1,7 @@
 <?php
-session_start();
+define('KEEP_SESSION_OPEN', true);
+require_once 'security.php';
+
 session_unset();
 session_destroy();
 header('Location: ../login.html');

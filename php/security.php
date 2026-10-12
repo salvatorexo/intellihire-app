@@ -2,6 +2,7 @@
 /* =========================================================
    IntelliHire - Security Helpers
    Includes: CSRF, input sanitization, audit log
+   Releases session lock early so parallel AJAX runs fast.
    ========================================================= */
 
 if (session_status() === PHP_SESSION_NONE) {
@@ -14,8 +15,12 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-/* ---------- CSRF ---------- */
+/* ---------- Release session lock unless explicitly kept open ---------- */
+if (!defined('KEEP_SESSION_OPEN')) {
+    session_write_close();
+}
 
+/* ---------- CSRF ---------- */
 function csrfToken() {
     if (empty($_SESSION['csrf_token'])) {
         $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -37,17 +42,14 @@ function verifyCsrf() {
 }
 
 /* ---------- Input sanitization ---------- */
-
 function cleanInput($value) {
     return htmlspecialchars(trim((string)$value), ENT_QUOTES, 'UTF-8');
 }
-
 function cleanEmail($email) {
     return filter_var(trim((string)$email), FILTER_SANITIZE_EMAIL);
 }
 
 /* ---------- Audit log ---------- */
-
 function auditLog(PDO $pdo, $action, $details = null) {
     try {
         $user_id = $_SESSION['user_id'] ?? null;
@@ -57,21 +59,17 @@ function auditLog(PDO $pdo, $action, $details = null) {
             VALUES (?, ?, ?, ?)
         ");
         $stmt->execute([$user_id, $action, $details, $ip]);
-    } catch (Exception $e) {
-        /* Never let logging break the app */
-    }
+    } catch (Exception $e) { /* never break app */ }
 }
 
 /* ---------- Session regeneration ---------- */
-
 function regenerateSession() {
     if (session_status() === PHP_SESSION_ACTIVE) {
         session_regenerate_id(true);
     }
 }
 
-/* ---------- Get client IP ---------- */
-
+/* ---------- Client IP ---------- */
 function clientIp() {
     return $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
 }

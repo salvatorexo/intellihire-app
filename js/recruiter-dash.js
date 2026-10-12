@@ -1,18 +1,24 @@
 /* =========================================================
-   IntelliHire - Recruiter Dashboard
+   IntelliHire - Recruiter Dashboard (Optimized)
+   Loads all data in parallel for faster rendering.
    ========================================================= */
 
-document.addEventListener('DOMContentLoaded', () => {
-    loadRecruiterInfo();
-    loadStats();
-    loadRecentApplications();
-    loadTopCandidates();
+document.addEventListener('DOMContentLoaded', async () => {
+    const toggle = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('sidebar');
+    if (toggle) {
+        toggle.addEventListener('click', () => sidebar.classList.toggle('open'));
+    }
+
+    await Promise.all([
+        loadRecruiterInfo(),
+        loadStats(),
+        loadRecentApplications(),
+        loadTopCandidates()
+    ]);
 });
 
-document.getElementById('menuToggle')?.addEventListener('click', () => {
-    document.getElementById('sidebar').classList.toggle('open');
-});
-
+/* ---------- User + Company Info ---------- */
 async function loadRecruiterInfo() {
     try {
         const res = await fetch('../php/recruiter-stats.php');
@@ -22,12 +28,15 @@ async function loadRecruiterInfo() {
             document.getElementById('userName').textContent = name;
             document.getElementById('welcomeName').textContent = name.split(' ')[0];
             document.getElementById('userAvatar').textContent = name.charAt(0).toUpperCase();
-            document.getElementById('welcomeCompany').textContent =
-                data.company ? `Manage vacancies at ${data.company.company_name}` : '';
+            if (data.company) {
+                document.getElementById('welcomeCompany').textContent =
+                    `Manage vacancies at ${data.company.company_name}`;
+            }
         }
-    } catch (err) { console.error(err); }
+    } catch (err) { console.error('Recruiter info error:', err); }
 }
 
+/* ---------- Stats ---------- */
 async function loadStats() {
     try {
         const res = await fetch('../php/recruiter-stats.php?stats=1');
@@ -39,11 +48,13 @@ async function loadStats() {
             document.getElementById('statInterviews').textContent   = data.stats.interviews;
             document.getElementById('statRejected').textContent     = data.stats.rejected;
         }
-    } catch (err) { console.error(err); }
+    } catch (err) { console.error('Stats error:', err); }
 }
 
+/* ---------- Recent Applications ---------- */
 async function loadRecentApplications() {
     const tbody = document.getElementById('recentAppsBody');
+    if (!tbody) return;
     try {
         const res = await fetch('../php/recruiter-stats.php?recent=1');
         const data = await res.json();
@@ -65,8 +76,10 @@ async function loadRecentApplications() {
     }
 }
 
+/* ---------- Top Candidates ---------- */
 async function loadTopCandidates() {
     const box = document.getElementById('topCandidates');
+    if (!box) return;
     try {
         const res = await fetch('../php/recruiter-stats.php?top=1');
         const data = await res.json();
@@ -94,9 +107,9 @@ async function loadTopCandidates() {
     }
 }
 
-/* Helpers */
+/* ---------- Helpers ---------- */
 function escapeHtml(str) {
     if (!str) return '';
-    return str.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    return String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 function capitalize(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }

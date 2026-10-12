@@ -1,8 +1,8 @@
 <?php
 /* =========================================================
    IntelliHire - Import users.sql into Aiven (one-time use)
-   Reads users.sql from the same folder as this script.
-   ⚠️ DELETE this file from your project after running!
+   Handles MySQL 8's sql_require_primary_key requirement.
+   ⚠️ DELETE this file after running!
    ========================================================= */
 
 require_once 'config.php';
@@ -23,13 +23,24 @@ header('Content-Type: text/html; charset=utf-8');
 echo "<h2>Importing users.sql into Aiven...</h2>";
 
 try {
-    $pdo->exec("SET FOREIGN_KEY_CHECKS=0");
+    /* 1. Relax MySQL 8 requirements for this session */
+    $pdo->exec("SET SESSION sql_require_primary_key = 0");
+    $pdo->exec("SET FOREIGN_KEY_CHECKS = 0");
+
+    /* 2. Drop existing users table if it exists (only if we have a CREATE statement) */
+    if (stripos($sql, 'CREATE TABLE') !== false) {
+        $pdo->exec("DROP TABLE IF EXISTS users");
+    }
+
+    /* 3. Run the SQL */
     $pdo->exec($sql);
-    $pdo->exec("SET FOREIGN_KEY_CHECKS=1");
+
+    /* 4. Re-enable foreign key checks */
+    $pdo->exec("SET FOREIGN_KEY_CHECKS = 1");
 
     $count = $pdo->query("SELECT COUNT(*) FROM users")->fetchColumn();
-    echo "<p style='color:green;font-size:1.2em;'>✅ Import completed successfully!</p>";
-    echo "<p>Total users now in Aiven: <strong>{$count}</strong></p>";
+    echo "<p style='color:green;font-size:1.2em;'>✅ Import completed!</p>";
+    echo "<p>Users now in Aiven: <strong>{$count}</strong></p>";
 
     echo "<h3>Users:</h3><ul>";
     $rows = $pdo->query("SELECT id, full_name, email, account_type FROM users ORDER BY id")->fetchAll();
@@ -40,7 +51,7 @@ try {
     }
     echo "</ul>";
 
-    echo "<p style='color:red;'><strong>⚠️ DELETE import-users.php and users.sql from your project and GitHub now.</strong></p>";
+    echo "<p style='color:red;'><strong>⚠️ DELETE import-users.php and users.sql from your PC and GitHub now.</strong></p>";
 
 } catch (PDOException $e) {
     echo "<p style='color:red;'>❌ Import failed: " . htmlspecialchars($e->getMessage()) . "</p>";

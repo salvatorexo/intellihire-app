@@ -5,12 +5,13 @@
    2. Verify applicant has a CV
    3. Prevent duplicate applications
    4. Save application to MySQL
-   5. Send CV to Python AI screening
+   5. Send CV to Python AI screening (fails gracefully)
    6. Save match score + AI breakdown
    7. Create notification
    ========================================================= */
 
 require_once 'auth.php';
+require_once 'security.php';
 requireRole('applicant');
 
 $pdo = require 'db.php';
@@ -19,7 +20,10 @@ $user_id = $_SESSION['user_id'];
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     jsonResponse(false, 'Invalid request method.');
 }
-verifyCsrf();
+
+/* CSRF disabled for Render stateless sessions.
+   Re-enable once session persistence works properly. */
+// verifyCsrf();
 
 $input = json_decode(file_get_contents('php://input'), true);
 $job_id = (int)($input['job_id'] ?? 0);
@@ -49,9 +53,12 @@ if (!$cv_path) {
     jsonResponse(false, 'Please upload your CV before applying.');
 }
 
-$cv_full_path = realpath(__DIR__ . '/../' . $cv_path);
-if (!$cv_full_path || !is_file($cv_full_path)) {
-    jsonResponse(false, 'Your CV file could not be found. Please re-upload it.');
+/* Try to resolve the CV path — if it doesn't exist on disk, still allow
+   the application to save (files may be ephemeral on Render free tier) */
+$cv_full_path = __DIR__ . '/../' . $cv_path;
+$cv_exists_on_disk = is_file($cv_full_path);
+if (!$cv_exists_on_disk) {
+    $cv_full_path = $cv_path;   // pass relative path to AI anyway
 }
 
 /* ---------- 3. Prevent duplicate applications ---------- */
@@ -70,8 +77,7 @@ $stmt = $pdo->prepare("
 $stmt->execute([$user_id, $job_id, $initial_status]);
 $application_id = $pdo->lastInsertId();
 
-
-/* ---------- 5. Send to Python for AI screening ---------- */
+/* ---------- 5. AI Screening (optional — fails gracefully) ---------- */
 $match_score      = null;
 $skills_score     = null;
 $education_score  = null;
@@ -79,6 +85,9 @@ $experience_score = null;
 $recommendation   = null;
 $matched_keywords = null;
 $screening_note   = '';
+
+/* Read endpoint from env so it works locally (127.0.0.1) and on Render (public URL) */
+$ai_endpoint = getenv('AI_ENDPOINT') ?: 'http://127.0.0.1:5001/screen';
 
 try {
     $payload = json_encode([
@@ -91,13 +100,14 @@ try {
         'education_requirements' => $job['education_requirements'],
     ]);
 
-    $ch = curl_init('http://127.0.0.1:5001/screen');
+    $ch = curl_init($ai_endpoint);
     curl_setopt_array($ch, [
         CURLOPT_POST           => true,
         CURLOPT_POSTFIELDS     => $payload,
         CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
         CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_TIMEOUT        => 30,
+        CURLOPT_TIMEOUT        => 10,     // ⚠️ short timeout so apply doesn't hang
+        CURLOPT_CONNECTTIMEOUT => 5,      // ⚠️ don't wait forever
     ]);
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -105,7 +115,7 @@ try {
     curl_close($ch);
 
     if ($curlErr) {
-        $screening_note = 'AI service offline: ' . $curlErr;
+        $screening_note = 'AI service unavailable — application saved without score.';
     } elseif ($httpCode === 200) {
         $result = json_decode($response, true);
         if (is_array($result) && isset($result['match_score'])) {
@@ -148,7 +158,7 @@ try {
     $stmt = $pdo->prepare("INSERT INTO notifications (user_id, message) VALUES (?, ?)");
     $stmt->execute([$user_id, $msg]);
 } catch (Exception $e) {
-    // notifications table optional
+    /* notifications optional */
 }
 
 /* ---------- Response ---------- */

@@ -1,8 +1,9 @@
 <?php
 /* =========================================================
    IntelliHire - Security Helpers
-   Includes: CSRF, input sanitization, audit log
-   Releases session lock early so parallel AJAX runs fast.
+   Includes: CSRF, input sanitization, audit log.
+   Releases session lock early for fast parallel AJAX.
+   CSRF verification is disabled for Render stateless sessions.
    ========================================================= */
 
 if (session_status() === PHP_SESSION_NONE) {
@@ -29,6 +30,13 @@ function csrfToken() {
 }
 
 function verifyCsrf() {
+    /* Temporarily disabled for Render stateless sessions.
+       Session tokens don't persist between the AJAX request
+       that fetches the token and the AJAX request that submits.
+       Re-enable once session storage is persistent. */
+    return;
+
+    // ---------- Original logic (kept for future use) ----------
     $sent = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? ($_POST['csrf_token'] ?? '');
     if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $sent)) {
         http_response_code(403);
@@ -45,6 +53,7 @@ function verifyCsrf() {
 function cleanInput($value) {
     return htmlspecialchars(trim((string)$value), ENT_QUOTES, 'UTF-8');
 }
+
 function cleanEmail($email) {
     return filter_var(trim((string)$email), FILTER_SANITIZE_EMAIL);
 }
@@ -59,7 +68,9 @@ function auditLog(PDO $pdo, $action, $details = null) {
             VALUES (?, ?, ?, ?)
         ");
         $stmt->execute([$user_id, $action, $details, $ip]);
-    } catch (Exception $e) { /* never break app */ }
+    } catch (Exception $e) {
+        /* Never let logging break the app */
+    }
 }
 
 /* ---------- Session regeneration ---------- */

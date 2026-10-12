@@ -1,6 +1,6 @@
 <?php
 /* =========================================================
-   IntelliHire - CV Upload Handler
+   IntelliHire - CV Upload Handler (Render-ready)
    Validates file type & size, stores securely, saves path.
    ========================================================= */
 
@@ -26,7 +26,7 @@ $allowed_mimes = [
     'application/pdf',
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
 ];
-$max_size = 5 * 1024 * 1024;   // 5 MB
+$max_size   = 5 * 1024 * 1024;                  // 5 MB
 $upload_dir = __DIR__ . '/../uploads/cvs/';
 
 /* ---------- Validate size ---------- */
@@ -43,7 +43,7 @@ if (!in_array($ext, $allowed_exts)) {
 
 /* ---------- Validate MIME ---------- */
 $finfo = finfo_open(FILEINFO_MIME_TYPE);
-$mime = finfo_file($finfo, $file['tmp_name']);
+$mime  = finfo_file($finfo, $file['tmp_name']);
 finfo_close($finfo);
 
 if (!in_array($mime, $allowed_mimes)) {
@@ -57,8 +57,13 @@ if (!is_dir($upload_dir)) {
     }
 }
 
+/* ---------- Verify directory is writable ---------- */
+if (!is_writable($upload_dir)) {
+    jsonResponse(false, 'Server storage is not writable.');
+}
+
 /* ---------- Generate safe unique filename ---------- */
-$safe_name = 'cv_' . $user_id . '_' . time() . '.' . $ext;
+$safe_name   = 'cv_' . $user_id . '_' . time() . '.' . $ext;
 $destination = $upload_dir . $safe_name;
 
 /* ---------- Move file ---------- */
@@ -67,21 +72,31 @@ if (!move_uploaded_file($file['tmp_name'], $destination)) {
 }
 
 /* ---------- Delete old CV (optional) ---------- */
-$stmt = $pdo->prepare("SELECT cv_path FROM applicants WHERE user_id = ? LIMIT 1");
-$stmt->execute([$user_id]);
-$old = $stmt->fetchColumn();
-if ($old) {
-    $old_path = __DIR__ . '/../' . $old;
-    if (is_file($old_path)) @unlink($old_path);
+try {
+    $stmt = $pdo->prepare("SELECT cv_path FROM applicants WHERE user_id = ? LIMIT 1");
+    $stmt->execute([$user_id]);
+    $old = $stmt->fetchColumn();
+    if ($old) {
+        $old_path = __DIR__ . '/../' . ltrim($old, '/');
+        if (is_file($old_path) && $old_path !== $destination) {
+            @unlink($old_path);
+        }
+    }
+} catch (Exception $e) {
+    /* non-fatal — continue */
 }
 
 /* ---------- Save path to DB ---------- */
 $relative_path = 'uploads/cvs/' . $safe_name;
+
 $stmt = $pdo->prepare("UPDATE applicants SET cv_path = ? WHERE user_id = ?");
 $stmt->execute([$relative_path, $user_id]);
 
+/* ---------- Respond ---------- */
 jsonResponse(true, 'CV uploaded successfully.', [
     'file_name'   => $original_name,
     'stored_name' => $safe_name,
-    'path'        => $relative_path
+    'path'        => $relative_path,
+    'size'        => $file['size'],
+    'mime'        => $mime
 ]);

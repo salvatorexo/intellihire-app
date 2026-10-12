@@ -1,10 +1,13 @@
 <?php
 /* =========================================================
-   IntelliHire - Send Password Reset Link (Resend API)
+   IntelliHire - Send Password Reset Link (Resend API version)
+   Uses Resend's HTTP API (over HTTPS) so it works on Render,
+   where outbound SMTP is blocked.
    ========================================================= */
 
 require_once 'security.php';
 require_once 'config.php';
+require_once 'mailer-config.php';   // 👈 defines APP_URL, MAIL_FROM, etc.
 
 $pdo = require 'db.php';
 
@@ -19,6 +22,7 @@ if ($email === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
     jsonResponse(false, 'Please enter a valid email address.');
 }
 
+/* ---------- Look up the user ---------- */
 $stmt = $pdo->prepare("SELECT id, full_name, email FROM users WHERE email = ? LIMIT 1");
 $stmt->execute([$email]);
 $user = $stmt->fetch();
@@ -30,6 +34,7 @@ if (!$user) {
     jsonResponse(true, $genericMessage);
 }
 
+/* ---------- Generate a fresh token ---------- */
 $token = bin2hex(random_bytes(32));
 $hash  = hash('sha256', $token);
 
@@ -51,21 +56,26 @@ $htmlBody = "
     <p style='color:#475569;'>Hi " . htmlspecialchars($user['full_name']) . ",</p>
     <p style='color:#475569;'>Click the button below to reset your password. This link expires in 1 hour.</p>
     <p style='text-align:center;margin:30px 0;'>
-        <a href='" . htmlspecialchars($link) . "' style='background:#2563eb;color:#fff;padding:12px 24px;text-decoration:none;border-radius:8px;display:inline-block;'>Reset Password</a>
+        <a href='" . htmlspecialchars($link) . "'
+           style='background:#2563eb;color:#fff;padding:12px 24px;text-decoration:none;border-radius:8px;display:inline-block;'>
+            Reset Password
+        </a>
     </p>
-    <p style='color:#64748b;font-size:0.85rem;'>Or copy this link: <br>" . htmlspecialchars($link) . "</p>
+    <p style='color:#64748b;font-size:0.85rem;'>Or copy this link:</p>
+    <p style='color:#2563eb;word-break:break-all;font-size:0.85rem;'>" . htmlspecialchars($link) . "</p>
 </div>
 ";
 
-/* ---------- Send via Resend API (uses HTTPS, allowed on Render) ---------- */
+/* ---------- Send via Resend API (HTTPS port 443 — allowed on Render) ---------- */
 $apiKey = getenv('RESEND_API_KEY');
 
 if (!$apiKey) {
+    auditLog($pdo, 'password_reset_email_failed', 'RESEND_API_KEY missing');
     jsonResponse(false, 'Email service is not configured. Please contact support.');
 }
 
 $payload = json_encode([
-    'from'    => 'onboarding@resend.dev',  // Use this for testing until you verify your own domain
+    'from'    => 'onboarding@resend.dev',   // Resend's free test sender
     'to'      => [$email],
     'subject' => 'Reset your IntelliHire password',
     'html'    => $htmlBody,

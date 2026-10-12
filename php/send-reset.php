@@ -4,8 +4,8 @@
    - Works for ANY registered user (applicant, recruiter, admin)
    - Always returns a generic message (prevents email enumeration)
    - Uses MySQL's clock for expiry
-   - Always includes demo_link in the response so the frontend
-     can show a clickable reset link (works around SMTP blocks)
+   - ALWAYS includes demo_link so the frontend can display
+     a clickable reset link regardless of SMTP status
    ========================================================= */
 
 require_once 'security.php';
@@ -122,7 +122,7 @@ try {
     $mail->SMTPSecure = MAIL_ENCRYPTION;
     $mail->Port       = MAIL_PORT;
     $mail->CharSet    = 'UTF-8';
-    $mail->Timeout    = 8;   // don't hang the request if SMTP is blocked
+    $mail->Timeout    = 8;
 
     $mail->setFrom(MAIL_FROM, MAIL_FROM_NAME);
     $mail->addAddress($email, $user['full_name']);
@@ -141,13 +141,13 @@ try {
 }
 
 /* ---------- Response ----------
-   ALWAYS include the reset link in the response. The frontend
-   will display it as a clickable link whether or not the email
-   actually went out. This makes the flow work on Render where
-   SMTP is blocked. */
-jsonResponse(true, $emailSent
-        ? $genericMessage
-        : 'Email delivery is disabled on this host — here is your reset link:',
+   ALWAYS include demo_link in the response. The frontend renders
+   it as a clickable link regardless of SMTP status. This makes
+   the reset flow work on Render where outbound SMTP is blocked. */
+jsonResponse(true,
+    $emailSent
+        ? 'If that email is registered, a reset link has been sent. You can also use the link below:'
+        : 'Email delivery is disabled on this host — use the reset link below:',
     [
         'demo_link'  => $link,
         'email_sent' => $emailSent,

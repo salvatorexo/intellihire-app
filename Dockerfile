@@ -11,15 +11,16 @@ RUN apt-get update && apt-get install -y \
 # Enable Apache modules for .htaccess support
 RUN a2enmod rewrite
 
-# ⚠️ Cache-buster: change this line every time you want a fresh build
-# Render reads this on each deploy. Increment the number below.
-ARG CACHE_BUST=2026-10-12-001
+# ⚠️ Cache-buster — increment this number every time you want
+# Docker to rebuild without using cached layers.
+ARG CACHE_BUST=2026-10-12-002
 
-# Copy your project files into the container's web root
+# Copy project files into the container's web root
 COPY . /var/www/html/
 
 # Set permissions for the uploads folder
-RUN chown -R www-data:www-data /var/www/html/uploads
+RUN mkdir -p /var/www/html/uploads/cvs /var/www/html/uploads/logos \
+    && chown -R www-data:www-data /var/www/html/uploads
 
 # Expose port 80
 EXPOSE 80

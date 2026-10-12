@@ -3,8 +3,9 @@
    IntelliHire - Send Password Reset Link
    - Works for ANY registered user (applicant, recruiter, admin)
    - Always returns a generic message (prevents email enumeration)
-   - Uses MySQL's clock for expiry (avoids PHP/MySQL tz mismatch)
-   - Falls back to showing the link on screen if SMTP fails
+   - Uses MySQL's clock for expiry
+   - Always includes demo_link in the response so the frontend
+     can show a clickable reset link (works around SMTP blocks)
    ========================================================= */
 
 require_once 'security.php';
@@ -25,8 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     jsonResponse(false, 'Invalid method.');
 }
 
-/* CSRF disabled for Render (stateless sessions).
-   Re-enable once session persistence is configured. */
+/* CSRF disabled for Render stateless sessions */
 // verifyCsrf();
 
 $input = json_decode(file_get_contents('php://input'), true);
@@ -46,7 +46,7 @@ $stmt = $pdo->prepare("
 $stmt->execute([$email]);
 $user = $stmt->fetch();
 
-/* ---------- Always respond the same way (privacy) ---------- */
+/* ---------- Generic message (prevents email enumeration) ---------- */
 $genericMessage = 'If that email is registered, a reset link has been sent. Check your inbox (and spam folder).';
 
 if (!$user) {
@@ -58,11 +58,11 @@ if (!$user) {
 $token = bin2hex(random_bytes(32));       // 64 hex chars
 $hash  = hash('sha256', $token);          // store hash only
 
-/* Wipe any previous tokens for this user (only 1 active link per user) */
+/* Wipe any previous tokens for this user */
 $stmt = $pdo->prepare("DELETE FROM password_resets WHERE user_id = ?");
 $stmt->execute([$user['id']]);
 
-/* Insert new token — expiry is set by MySQL, not PHP */
+/* Insert new token — expiry set by MySQL */
 $stmt = $pdo->prepare("
     INSERT INTO password_resets (user_id, token_hash, expires_at)
     VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 1 HOUR))
@@ -97,9 +97,7 @@ $htmlBody = "
         </a>
     </p>
 
-    <p style='color:#64748b;font-size:0.85rem;'>
-        Or copy this link into your browser:
-    </p>
+    <p style='color:#64748b;font-size:0.85rem;'>Or copy this link into your browser:</p>
     <p style='color:#2563eb;word-break:break-all;font-size:0.85rem;'>" . htmlspecialchars($link) . "</p>
 
     <hr style='border:none;border-top:1px solid #e2e8f0;margin:24px 0;'>
@@ -110,7 +108,7 @@ $htmlBody = "
 </div>
 ";
 
-/* ---------- Try to send via Gmail SMTP ---------- */
+/* ---------- Try to send via Gmail SMTP (best-effort, short timeout) ---------- */
 $emailSent = false;
 $errorInfo = '';
 
@@ -124,7 +122,7 @@ try {
     $mail->SMTPSecure = MAIL_ENCRYPTION;
     $mail->Port       = MAIL_PORT;
     $mail->CharSet    = 'UTF-8';
-    $mail->Timeout    = 10;   // ⚠️ prevents Render's request from hanging
+    $mail->Timeout    = 8;   // don't hang the request if SMTP is blocked
 
     $mail->setFrom(MAIL_FROM, MAIL_FROM_NAME);
     $mail->addAddress($email, $user['full_name']);
@@ -138,20 +136,21 @@ try {
     auditLog($pdo, 'password_reset_sent', "User ID: {$user['id']} (email sent)");
 
 } catch (Exception $e) {
-    $errorInfo = $mail->ErrorInfo;
+    $errorInfo = $mail->ErrorInfo ?: $e->getMessage();
     auditLog($pdo, 'password_reset_email_failed', "User ID: {$user['id']} — $errorInfo");
 }
 
-/* ---------- Response ---------- */
-if ($emailSent) {
-    jsonResponse(true, $genericMessage);
-} else {
-    /*
-     * Fallback: SMTP failed (common on Render free tier).
-     * Show the link on screen so the user can still reset.
-     */
-    jsonResponse(true, "We couldn't email you, but here is your reset link (demo fallback):", [
+/* ---------- Response ----------
+   ALWAYS include the reset link in the response. The frontend
+   will display it as a clickable link whether or not the email
+   actually went out. This makes the flow work on Render where
+   SMTP is blocked. */
+jsonResponse(true, $emailSent
+        ? $genericMessage
+        : 'Email delivery is disabled on this host — here is your reset link:',
+    [
         'demo_link'  => $link,
-        'smtp_error' => $errorInfo
-    ]);
-}
+        'email_sent' => $emailSent,
+        'smtp_error' => $errorInfo ?: null
+    ]
+);

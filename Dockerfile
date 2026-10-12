@@ -11,14 +11,18 @@ RUN apt-get update && apt-get install -y \
 # Enable Apache modules for .htaccess support
 RUN a2enmod rewrite
 
-# ⚠️ Cache-buster — increment this number every time you want
-# Docker to rebuild without using cached layers.
-ARG CACHE_BUST=2026-10-12-002
+# ⚠️ Disable OPcache revalidation delay so updated PHP files run immediately
+RUN echo "opcache.validate_timestamps=1" >> /usr/local/etc/php/conf.d/opcache.ini \
+    && echo "opcache.revalidate_freq=0" >> /usr/local/etc/php/conf.d/opcache.ini \
+    && echo "opcache.file_update_protection=0" >> /usr/local/etc/php/conf.d/opcache.ini
+
+# ⚠️ Cache-buster — increment to force a fresh Docker build
+ARG CACHE_BUST=2026-10-12-003
 
 # Copy project files into the container's web root
 COPY . /var/www/html/
 
-# Set permissions for the uploads folder
+# Set permissions for uploads folder
 RUN mkdir -p /var/www/html/uploads/cvs /var/www/html/uploads/logos \
     && chown -R www-data:www-data /var/www/html/uploads
 

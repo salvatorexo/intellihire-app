@@ -1,10 +1,7 @@
 <?php
 /* =========================================================
-   IntelliHire - Recruiter Dashboard Stats
-   ?stats=1   -> stats
-   ?recent=1  -> recent applications
-   ?top=1     -> top ranked candidates
-   (default)  -> user + company
+   IntelliHire - Recruiter Dashboard Data (Optimized)
+   Returns everything in ONE response.
    ========================================================= */
 
 require_once 'auth.php';
@@ -13,7 +10,7 @@ requireRole('recruiter');
 $pdo = require 'db.php';
 $user_id = $_SESSION['user_id'];
 
-/* ---------- Get recruiter's ID ---------- */
+/* ---------- Get recruiter + company ---------- */
 $stmt = $pdo->prepare("
     SELECT r.id AS recruiter_id, r.company_name, r.industry
     FROM recruiters r
@@ -26,82 +23,67 @@ $recruiter = $stmt->fetch();
 if (!$recruiter) jsonResponse(false, 'Recruiter profile not found.');
 $recruiter_id = $recruiter['recruiter_id'];
 
-/* ---------- Stats ---------- */
-if (isset($_GET['stats'])) {
-    $stats = [
-        'vacancies'    => 0,
-        'applications' => 0,
-        'shortlisted'  => 0,
-        'interviews'   => 0,
-        'rejected'     => 0,
-    ];
+/* ---------- Single-shot stats query ---------- */
+$stmt = $pdo->prepare("
+    SELECT
+        (SELECT COUNT(*) FROM jobs WHERE recruiter_id = ?)                                    AS vacancies,
+        (SELECT COUNT(*) FROM applications a JOIN jobs j ON a.job_id=j.id
+            WHERE j.recruiter_id = ?)                                                          AS total_apps,
+        (SELECT COUNT(*) FROM applications a JOIN jobs j ON a.job_id=j.id
+            WHERE j.recruiter_id = ? AND a.status='shortlisted')                              AS shortlisted,
+        (SELECT COUNT(*) FROM applications a JOIN jobs j ON a.job_id=j.id
+            WHERE j.recruiter_id = ? AND a.status='interview')                                AS interviews,
+        (SELECT COUNT(*) FROM applications a JOIN jobs j ON a.job_id=j.id
+            WHERE j.recruiter_id = ? AND a.status='rejected')                                 AS rejected
+");
+$stmt->execute([$recruiter_id, $recruiter_id, $recruiter_id, $recruiter_id, $recruiter_id]);
+$s = $stmt->fetch();
 
-    // Vacancies
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM jobs WHERE recruiter_id = ?");
-    $stmt->execute([$recruiter_id]);
-    $stats['vacancies'] = (int)$stmt->fetchColumn();
+/* ---------- Recent applications ---------- */
+$stmt = $pdo->prepare("
+    SELECT a.id, a.status, a.match_score, a.applied_at,
+           u.full_name AS candidate_name,
+           j.title     AS job_title
+    FROM applications a
+    JOIN jobs j    ON a.job_id = j.id
+    JOIN users u   ON a.applicant_id = u.id
+    WHERE j.recruiter_id = ?
+    ORDER BY a.applied_at DESC
+    LIMIT 6
+");
+$stmt->execute([$recruiter_id]);
+$recent = $stmt->fetchAll();
 
-    // Applications by status
-    $stmt = $pdo->prepare("
-        SELECT
-            COUNT(*) AS total,
-            SUM(a.status = 'shortlisted') AS shortlisted,
-            SUM(a.status = 'interview')   AS interviews,
-            SUM(a.status = 'rejected')    AS rejected
-        FROM applications a
-        JOIN jobs j ON a.job_id = j.id
-        WHERE j.recruiter_id = ?
-    ");
-    $stmt->execute([$recruiter_id]);
-    $row = $stmt->fetch();
-    $stats['applications'] = (int)($row['total'] ?? 0);
-    $stats['shortlisted']  = (int)($row['shortlisted'] ?? 0);
-    $stats['interviews']   = (int)($row['interviews'] ?? 0);
-    $stats['rejected']     = (int)($row['rejected'] ?? 0);
+/* ---------- Top candidates ---------- */
+$stmt = $pdo->prepare("
+    SELECT u.full_name AS candidate_name,
+           j.title     AS job_title,
+           a.match_score
+    FROM applications a
+    JOIN jobs j  ON a.job_id = j.id
+    JOIN users u ON a.applicant_id = u.id
+    WHERE j.recruiter_id = ?
+      AND a.match_score IS NOT NULL
+    ORDER BY a.match_score DESC
+    LIMIT 5
+");
+$stmt->execute([$recruiter_id]);
+$top = $stmt->fetchAll();
 
-    jsonResponse(true, 'OK', ['stats' => $stats]);
-}
-
-/* ---------- Recent Applications ---------- */
-if (isset($_GET['recent'])) {
-    $stmt = $pdo->prepare("
-        SELECT a.id, a.status, a.match_score, a.applied_at,
-               u.full_name AS candidate_name,
-               j.title     AS job_title
-        FROM applications a
-        JOIN jobs j    ON a.job_id = j.id
-        JOIN users u   ON a.applicant_id = u.id
-        WHERE j.recruiter_id = ?
-        ORDER BY a.applied_at DESC
-        LIMIT 6
-    ");
-    $stmt->execute([$recruiter_id]);
-    jsonResponse(true, 'OK', ['recent' => $stmt->fetchAll()]);
-}
-
-/* ---------- Top Candidates ---------- */
-if (isset($_GET['top'])) {
-    $stmt = $pdo->prepare("
-        SELECT u.full_name AS candidate_name,
-               j.title     AS job_title,
-               a.match_score
-        FROM applications a
-        JOIN jobs j  ON a.job_id = j.id
-        JOIN users u ON a.applicant_id = u.id
-        WHERE j.recruiter_id = ?
-          AND a.match_score IS NOT NULL
-        ORDER BY a.match_score DESC
-        LIMIT 5
-    ");
-    $stmt->execute([$recruiter_id]);
-    jsonResponse(true, 'OK', ['top' => $stmt->fetchAll()]);
-}
-
-/* ---------- Default: user + company ---------- */
+/* ---------- Response ---------- */
 jsonResponse(true, 'OK', [
-    'user'    => [
+    'user' => [
         'full_name' => $_SESSION['full_name'],
         'email'     => $_SESSION['email'],
     ],
-    'company' => $recruiter
+    'company' => $recruiter,
+    'stats' => [
+        'vacancies'    => (int)$s['vacancies'],
+        'applications' => (int)$s['total_apps'],
+        'shortlisted'  => (int)$s['shortlisted'],
+        'interviews'   => (int)$s['interviews'],
+        'rejected'     => (int)$s['rejected'],
+    ],
+    'recent' => $recent,
+    'top'    => $top,
 ]);

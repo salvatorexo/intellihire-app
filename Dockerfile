@@ -11,10 +11,14 @@ RUN apt-get update && apt-get install -y \
 # Enable Apache modules for .htaccess support
 RUN a2enmod rewrite
 
+# ⚠️ Cache-buster: change this line every time you want a fresh build
+# Render reads this on each deploy. Increment the number below.
+ARG CACHE_BUST=2026-10-12-001
+
 # Copy your project files into the container's web root
 COPY . /var/www/html/
 
-# Set permissions for the uploads folder (adjust if needed)
+# Set permissions for the uploads folder
 RUN chown -R www-data:www-data /var/www/html/uploads
 
 # Expose port 80

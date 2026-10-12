@@ -1,10 +1,10 @@
 <?php
 /* =========================================================
-   IntelliHire - Login Handler (Hardened)
+   IntelliHire - Login Handler (Render-compatible)
    - Rate limited
-   - CSRF protected (via header)
    - Session regenerated on success
    - Audit logged
+   - CSRF temporarily disabled for Render stateless sessions
    ========================================================= */
 
 require_once 'security.php';
@@ -18,8 +18,13 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     jsonResponse(false, 'Invalid request method.');
 }
 
-/* CSRF check */
-verifyCsrf();
+/* ---------------------------------------------------------
+   CSRF verification — temporarily disabled
+   Reason: Render stateless sessions invalidate tokens between
+   the token fetch and the login submit. Re-enable later once
+   session.save_path is configured for persistence.
+   --------------------------------------------------------- */
+// verifyCsrf();
 
 $input = json_decode(file_get_contents('php://input'), true);
 if (!$input) jsonResponse(false, 'Invalid or missing data.');

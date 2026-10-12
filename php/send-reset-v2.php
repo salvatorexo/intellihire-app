@@ -1,13 +1,13 @@
 <?php
 /* =========================================================
-   IntelliHire - Send Password Reset Link (Resend API version)
-   Uses Resend's HTTP API (over HTTPS) so it works on Render,
-   where outbound SMTP is blocked.
+   IntelliHire - Send Password Reset Link (Brevo API)
+   Sends to ANY email using Brevo's free tier.
+   Works on Render (uses HTTPS port 443).
    ========================================================= */
 
 require_once 'security.php';
 require_once 'config.php';
-require_once 'mailer-config.php';   // 👈 defines APP_URL, MAIL_FROM, etc.
+require_once 'mailer-config.php';
 
 $pdo = require 'db.php';
 
@@ -66,28 +66,34 @@ $htmlBody = "
 </div>
 ";
 
-/* ---------- Send via Resend API (HTTPS port 443 — allowed on Render) ---------- */
-$apiKey = getenv('RESEND_API_KEY');
+/* ---------- Send via Brevo API ---------- */
+$apiKey = getenv('BREVO_API_KEY');
 
 if (!$apiKey) {
-    auditLog($pdo, 'password_reset_email_failed', 'RESEND_API_KEY missing');
-    jsonResponse(false, 'Email service is not configured. Please contact support.');
+    auditLog($pdo, 'password_reset_email_failed', 'BREVO_API_KEY missing');
+    jsonResponse(false, 'Email service is not configured.');
 }
 
 $payload = json_encode([
-    'from'    => 'onboarding@resend.dev',   // Resend's free test sender
-    'to'      => [$email],
-    'subject' => 'Reset your IntelliHire password',
-    'html'    => $htmlBody,
+    'sender' => [
+        'name'  => 'IntelliHire',
+        'email' => 'kiboenkemboi005@gmail.com',
+    ],
+    'to' => [
+        ['email' => $email, 'name' => $user['full_name']],
+    ],
+    'subject'     => 'Reset your IntelliHire password',
+    'htmlContent' => $htmlBody,
 ]);
 
-$ch = curl_init('https://api.resend.com/emails');
+$ch = curl_init('https://api.brevo.com/v3/smtp/email');
 curl_setopt_array($ch, [
     CURLOPT_POST           => true,
     CURLOPT_POSTFIELDS     => $payload,
     CURLOPT_HTTPHEADER     => [
-        'Authorization: Bearer ' . $apiKey,
+        'api-key: ' . $apiKey,
         'Content-Type: application/json',
+        'Accept: application/json',
     ],
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_TIMEOUT        => 15,
@@ -103,12 +109,11 @@ if ($curlErr) {
     jsonResponse(false, 'Could not send reset email. Please try again later.');
 }
 
-if ($httpCode !== 200) {
+if ($httpCode < 200 || $httpCode >= 300) {
     auditLog($pdo, 'password_reset_email_failed', "HTTP $httpCode: $response");
     jsonResponse(false, 'Email service error. Please try again later.');
 }
 
 auditLog($pdo, 'password_reset_sent', "User ID: {$user['id']}");
 
-/* ---------- Response ---------- */
 jsonResponse(true, $genericMessage);

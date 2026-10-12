@@ -1,11 +1,11 @@
 <?php
 /* =========================================================
-   IntelliHire - Apply to a Job
+   IntelliHire - Apply to a Job (Render-ready)
    1. Verify applicant is logged in
    2. Verify applicant has a CV
    3. Prevent duplicate applications
    4. Save application to MySQL
-   5. Send CV to Python AI screening (fails gracefully)
+   5. Send CV contents to Python AI screening (base64)
    6. Save match score + AI breakdown
    7. Create notification
    ========================================================= */
@@ -53,12 +53,16 @@ if (!$cv_path) {
     jsonResponse(false, 'Please upload your CV before applying.');
 }
 
-/* Try to resolve the CV path — if it doesn't exist on disk, still allow
-   the application to save (files may be ephemeral on Render free tier) */
-$cv_full_path = __DIR__ . '/../' . $cv_path;
-$cv_exists_on_disk = is_file($cv_full_path);
-if (!$cv_exists_on_disk) {
-    $cv_full_path = $cv_path;   // pass relative path to AI anyway
+/* Resolve the CV path on disk and read its contents for transfer */
+$cv_full_path = __DIR__ . '/../' . ltrim($cv_path, '/');
+$cv_base64    = null;
+$cv_filename  = basename($cv_path);
+
+if (is_file($cv_full_path) && is_readable($cv_full_path)) {
+    $raw = @file_get_contents($cv_full_path);
+    if ($raw !== false) {
+        $cv_base64 = base64_encode($raw);
+    }
 }
 
 /* ---------- 3. Prevent duplicate applications ---------- */
@@ -86,54 +90,59 @@ $recommendation   = null;
 $matched_keywords = null;
 $screening_note   = '';
 
-/* Read endpoint from env so it works locally (127.0.0.1) and on Render (public URL) */
-$ai_endpoint = getenv('AI_ENDPOINT') ?: 'http://127.0.0.1:5001/screen';
+/* Read endpoint from env so it works locally and on Render */
+$ai_endpoint = getenv('AI_ENDPOINT') ?: 'https://intellihire-python.onrender.com/screen';
 
-try {
-    $payload = json_encode([
-        'application_id'         => (int)$application_id,
-        'cv_path'                => $cv_full_path,
-        'job_title'              => $job['title'],
-        'job_description'        => $job['description'],
-        'job_requirements'       => $job['requirements'],
-        'job_skills'             => $job['skills'],
-        'education_requirements' => $job['education_requirements'],
-    ]);
+if ($cv_base64 === null) {
+    $screening_note = 'CV file missing on server — application saved without score.';
+} else {
+    try {
+        $payload = json_encode([
+            'application_id'         => (int)$application_id,
+            'cv_base64'              => $cv_base64,
+            'cv_filename'            => $cv_filename,
+            'job_title'              => $job['title'],
+            'job_description'        => $job['description'],
+            'job_requirements'       => $job['requirements'],
+            'job_skills'             => $job['skills'],
+            'education_requirements' => $job['education_requirements'],
+        ]);
 
-    $ch = curl_init($ai_endpoint);
-    curl_setopt_array($ch, [
-        CURLOPT_POST           => true,
-        CURLOPT_POSTFIELDS     => $payload,
-        CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_TIMEOUT        => 10,     // ⚠️ short timeout so apply doesn't hang
-        CURLOPT_CONNECTTIMEOUT => 5,      // ⚠️ don't wait forever
-    ]);
-    $response = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    $curlErr  = curl_error($ch);
-    curl_close($ch);
+        $ch = curl_init($ai_endpoint);
+        curl_setopt_array($ch, [
+            CURLOPT_POST           => true,
+            CURLOPT_POSTFIELDS     => $payload,
+            CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT        => 60,     // Render free tier can take ~50s to wake up
+            CURLOPT_CONNECTTIMEOUT => 10,
+        ]);
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlErr  = curl_error($ch);
+        curl_close($ch);
 
-    if ($curlErr) {
-        $screening_note = 'AI service unavailable — application saved without score.';
-    } elseif ($httpCode === 200) {
-        $result = json_decode($response, true);
-        if (is_array($result) && isset($result['match_score'])) {
-            $match_score      = (float)$result['match_score'];
-            $skills_score     = isset($result['skills_score'])     ? (float)$result['skills_score']     : null;
-            $education_score  = isset($result['education_score'])  ? (float)$result['education_score']  : null;
-            $experience_score = isset($result['experience_score']) ? (float)$result['experience_score'] : null;
-            $recommendation   = $result['recommendation']   ?? null;
-            $matched_keywords = $result['matched_keywords'] ?? null;
-            $screening_note   = 'AI screening completed.';
+        if ($curlErr) {
+            $screening_note = 'AI service unavailable — application saved without score.';
+        } elseif ($httpCode === 200) {
+            $result = json_decode($response, true);
+            if (is_array($result) && isset($result['match_score'])) {
+                $match_score      = (float)$result['match_score'];
+                $skills_score     = isset($result['skills_score'])     ? (float)$result['skills_score']     : null;
+                $education_score  = isset($result['education_score'])  ? (float)$result['education_score']  : null;
+                $experience_score = isset($result['experience_score']) ? (float)$result['experience_score'] : null;
+                $recommendation   = $result['recommendation']   ?? null;
+                $matched_keywords = $result['matched_keywords'] ?? null;
+                $screening_note   = 'AI screening completed.';
+            } else {
+                $screening_note = 'AI returned unexpected response.';
+            }
         } else {
-            $screening_note = 'AI returned unexpected response.';
+            $screening_note = 'AI service returned HTTP ' . $httpCode;
         }
-    } else {
-        $screening_note = 'AI service returned HTTP ' . $httpCode;
+    } catch (Exception $e) {
+        $screening_note = 'AI error: ' . $e->getMessage();
     }
-} catch (Exception $e) {
-    $screening_note = 'AI error: ' . $e->getMessage();
 }
 
 /* ---------- 6. Save AI screening result ---------- */

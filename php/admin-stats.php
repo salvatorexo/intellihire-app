@@ -85,7 +85,10 @@ $stats = [
 $stats['applicants']       = (int)$pdo->query("SELECT COUNT(*) FROM users WHERE account_type = 'applicant'")->fetchColumn();
 $stats['recruiters']       = (int)$pdo->query("SELECT COUNT(*) FROM users WHERE account_type = 'recruiter'")->fetchColumn();
 $stats['companies']        = (int)$pdo->query("SELECT COUNT(*) FROM recruiters")->fetchColumn();
-$stats['vacancies']        = (int)$pdo->query("SELECT COUNT(*) FROM jobs")->fetchColumn();
+
+/* ⬇️ CHANGED: count only open jobs so it matches what recruiters see */
+$stats['vacancies']        = (int)$pdo->query("SELECT COUNT(*) FROM jobs WHERE status = 'open'")->fetchColumn();
+
 $stats['applications']     = (int)$pdo->query("SELECT COUNT(*) FROM applications")->fetchColumn();
 $stats['shortlisted']      = (int)$pdo->query("SELECT COUNT(*) FROM applications WHERE status = 'shortlisted'")->fetchColumn();
 $stats['interviews']       = (int)$pdo->query("SELECT COUNT(*) FROM applications WHERE status = 'interview'")->fetchColumn();

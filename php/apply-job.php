@@ -114,7 +114,7 @@ if ($cv_base64 === null) {
             CURLOPT_POSTFIELDS     => $payload,
             CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_TIMEOUT        => 60,     // Render free tier can take ~50s to wake up
+            CURLOPT_TIMEOUT        => 25,     // Stay under Render's 30s proxy timeout
             CURLOPT_CONNECTTIMEOUT => 10,
         ]);
         $response = curl_exec($ch);

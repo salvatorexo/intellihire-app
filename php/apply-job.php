@@ -1,6 +1,6 @@
 <?php
 /* =========================================================
-   IntelliHire - Apply to a Job (Render-ready)
+   IntelliHire - Apply to a Job (Render-ready, debug-enabled)
    1. Verify applicant is logged in
    2. Verify applicant has a CV
    3. Prevent duplicate applications
@@ -21,8 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     jsonResponse(false, 'Invalid request method.');
 }
 
-/* CSRF disabled for Render stateless sessions.
-   Re-enable once session persistence works properly. */
+/* CSRF disabled for Render stateless sessions. */
 // verifyCsrf();
 
 $input = json_decode(file_get_contents('php://input'), true);
@@ -90,7 +89,6 @@ $recommendation   = null;
 $matched_keywords = null;
 $screening_note   = '';
 
-/* Read endpoint from env so it works locally and on Render */
 $ai_endpoint = getenv('AI_ENDPOINT') ?: 'https://intellihire-python.onrender.com/screen';
 
 if ($cv_base64 === null) {
@@ -110,20 +108,30 @@ if ($cv_base64 === null) {
 
         $ch = curl_init($ai_endpoint);
         curl_setopt_array($ch, [
-            CURLOPT_POST           => true,
-            CURLOPT_POSTFIELDS     => $payload,
-            CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_TIMEOUT        => 25,     // Stay under Render's 30s proxy timeout
-            CURLOPT_CONNECTTIMEOUT => 10,
+            CURLOPT_POST             => true,
+            CURLOPT_POSTFIELDS       => $payload,
+            CURLOPT_HTTPHEADER       => ['Content-Type: application/json'],
+            CURLOPT_RETURNTRANSFER   => true,
+            CURLOPT_TIMEOUT          => 25,
+            CURLOPT_CONNECTTIMEOUT   => 10,
+            CURLOPT_SSL_VERIFYPEER   => false,      // avoid cert issues on shared hosts
+            CURLOPT_SSL_VERIFYHOST   => 0,
+            CURLOPT_FOLLOWLOCATION   => true,       // follow redirects from Render
+            CURLOPT_HTTP_VERSION     => CURL_HTTP_VERSION_1_1, // some proxies dislike HTTP/2
+            CURLOPT_VERBOSE          => false,      // flip to true only when debugging locally
+            CURLOPT_USERAGENT        => 'IntelliHire-PHP/1.0',
+            CURLOPT_HEADER           => false,
         ]);
+
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         $curlErr  = curl_error($ch);
+        $curlErrNo = curl_errno($ch);
+        $curlInfo = curl_getinfo($ch);
         curl_close($ch);
 
         if ($curlErr) {
-            $screening_note = 'AI service unavailable — application saved without score.';
+            $screening_note = 'AI service unavailable — ' . $curlErr . ' (code ' . $curlErrNo . ')';
         } elseif ($httpCode === 200) {
             $result = json_decode($response, true);
             if (is_array($result) && isset($result['match_score'])) {
@@ -138,7 +146,11 @@ if ($cv_base64 === null) {
                 $screening_note = 'AI returned unexpected response.';
             }
         } else {
-            $screening_note = 'AI service returned HTTP ' . $httpCode;
+            // Include more info so we can finally see what's wrong
+            $snippet = substr((string)$response, 0, 200);
+            $screening_note = 'AI service returned HTTP ' . $httpCode
+                            . ' (curl errno ' . $curlErrNo . ')'
+                            . ($snippet ? ' — ' . $snippet : '');
         }
     } catch (Exception $e) {
         $screening_note = 'AI error: ' . $e->getMessage();
@@ -163,7 +175,7 @@ if ($match_score !== null) {
 /* ---------- 7. Create notification ---------- */
 try {
     $msg = "Your application for \"{$job['title']}\" at {$job['company_name']} was submitted successfully."
-         . ($match_score !== null ? " AI match score: {$match_score}%." : "");
+         . ($match_score !== null ? " AI match score: {$match_score}%." : " ({$screening_note})");
     $stmt = $pdo->prepare("INSERT INTO notifications (user_id, message) VALUES (?, ?)");
     $stmt->execute([$user_id, $msg]);
 } catch (Exception $e) {

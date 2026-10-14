@@ -560,3 +560,269 @@
 .sidebar-nav .nav-item:not(.active):hover {
     font-weight: 500;
 }
+
+/* =========================================================
+   Recruiter pages — polish (tables, filters, empty states)
+   ========================================================= */
+
+/* Page title */
+.main-content > h1,
+.main-content > h2,
+.topbar h2 {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #0f172a;
+    letter-spacing: -0.3px;
+    margin: 0 0 22px;
+}
+
+/* ---------- Filter bar ---------- */
+.main-content .filters,
+.main-content .filter-bar,
+.main-content .filters-row,
+.main-content .controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 14px 18px;
+    padding: 18px 22px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.04);
+    margin-bottom: 22px;
+}
+
+.main-content .filters label,
+.main-content .filter-bar label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    margin-bottom: 6px;
+}
+
+.main-content .filters select,
+.main-content .filters input,
+.main-content .filter-bar select,
+.main-content .filter-bar input {
+    padding: 10px 14px;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 9px;
+    background: #f9fafb;
+    color: #111827;
+    font-size: 0.92rem;
+    font-family: inherit;
+    min-width: 160px;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.main-content .filters select:focus,
+.main-content .filters input:focus,
+.main-content .filter-bar select:focus,
+.main-content .filter-bar input:focus {
+    outline: none;
+    border-color: #2563eb;
+    background: #ffffff;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+}
+
+/* ---------- Reset button (styled like a secondary btn) ---------- */
+.main-content button.btn-outline,
+.main-content .btn-outline,
+.main-content button.reset,
+.main-content .reset-btn {
+    padding: 11px 22px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.92rem;
+    background: #ffffff;
+    color: #374151;
+    border: 1.5px solid #d1d5db;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.12s ease;
+}
+
+.main-content button.btn-outline:hover,
+.main-content .btn-outline:hover,
+.main-content button.reset:hover,
+.main-content .reset-btn:hover {
+    background: #f3f4f6;
+    border-color: #9ca3af;
+    transform: translateY(-1px);
+}
+
+/* ---------- Data table ---------- */
+.main-content .table-wrap,
+.main-content .table-container,
+.main-content .card > table,
+.main-content table.applications,
+.main-content table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 2px 14px rgba(15, 23, 42, 0.05);
+}
+
+.main-content table thead th {
+    background: #f8fafc;
+    color: #64748b;
+    font-size: 0.76rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    text-align: left;
+    padding: 14px 18px;
+    border-bottom: 1px solid #e5e7eb;
+    white-space: nowrap;
+}
+
+.main-content table tbody td {
+    padding: 16px 18px;
+    font-size: 0.92rem;
+    color: #1e293b;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+}
+
+.main-content table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.main-content table tbody tr {
+    transition: background 0.15s ease;
+}
+
+.main-content table tbody tr:hover {
+    background: #f8fafc;
+}
+
+/* Rank badge */
+.main-content table tbody td:first-child {
+    font-weight: 700;
+    color: #2563eb;
+}
+
+/* AI Score emphasis */
+.main-content .ai-score,
+.main-content table tbody td strong {
+    font-weight: 700;
+}
+
+/* Recommendation colors */
+.main-content .recommendation,
+.main-content .rec {
+    font-weight: 600;
+}
+
+.main-content .recommendation.strong,
+.main-content .rec-strong {
+    color: #059669;
+}
+
+.main-content .recommendation.good,
+.main-content .rec-good {
+    color: #d97706;
+}
+
+.main-content .recommendation.weak,
+.main-content .rec-weak {
+    color: #dc2626;
+}
+
+/* Status pill */
+.main-content .status-badge,
+.main-content .badge {
+    display: inline-block;
+    padding: 5px 12px;
+    border-radius: 999px;
+    font-size: 0.76rem;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    text-transform: capitalize;
+}
+
+.main-content .status-badge.open,
+.main-content .badge.open,
+.main-content .status-badge.applied {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.main-content .status-badge.shortlisted {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.main-content .status-badge.interview {
+    background: #ede9fe;
+    color: #6d28d9;
+}
+
+.main-content .status-badge.rejected {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.main-content .status-badge.closed {
+    background: #e5e7eb;
+    color: #4b5563;
+}
+
+/* ---------- Empty state ---------- */
+.main-content .empty,
+.main-content td.empty,
+.main-content .empty-state {
+    text-align: center;
+    padding: 42px 20px;
+    color: #94a3b8;
+    font-size: 0.95rem;
+    background: #ffffff;
+    border-radius: 14px;
+}
+
+.main-content .empty::before {
+    content: "🔍";
+    display: block;
+    font-size: 2rem;
+    margin-bottom: 10px;
+    opacity: 0.6;
+}
+
+/* ---------- Section card wrapper (if any) ---------- */
+.main-content .card,
+.main-content .panel {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    padding: 22px 24px;
+    box-shadow: 0 2px 14px rgba(15, 23, 42, 0.05);
+    margin-bottom: 22px;
+}
+
+/* ---------- Action buttons in table rows ---------- */
+.main-content table .btn,
+.main-content table button {
+    padding: 7px 14px;
+    border-radius: 8px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    border: 1.5px solid #d1d5db;
+    background: #ffffff;
+    color: #374151;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.12s ease;
+}
+
+.main-content table .btn:hover,
+.main-content table button:hover {
+    background: #f3f4f6;
+    border-color: #9ca3af;
+    transform: translateY(-1px);
+}

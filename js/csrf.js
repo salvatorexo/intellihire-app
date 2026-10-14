@@ -44,7 +44,7 @@
        --------------------------------------------------- */
     function fetchToken() {
         if (tokenPromise) return tokenPromise;
-        tokenPromise = fetch('php/csrf-token.php', {
+        tokenPromise = fetch('../php/csrf-token.php', {
             credentials: 'same-origin'
         })
         .then(res => res.json())

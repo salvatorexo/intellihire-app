@@ -226,3 +226,56 @@
 @media (max-width: 800px) {
     .vacancy-form .form-grid { grid-template-columns: 1fr; }
 }
+
+/* =========================================================
+   Modal — visibility rules
+   The JS adds .active to #editModal when the user clicks Edit.
+   Without these rules the modal stays hidden (display: none).
+   ========================================================= */
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    display: none;               /* hidden by default */
+    z-index: 9999;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.modal-overlay.active {
+    display: flex;                /* shown when .active is added */
+    align-items: flex-start;
+    justify-content: center;
+    padding-top: 40px;
+}
+
+.modal-overlay .modal {
+    background: #fff;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 720px;
+    padding: 26px;
+    position: relative;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+    animation: modalFadeIn 0.18s ease-out;
+}
+
+.modal-overlay .modal-close {
+    position: absolute;
+    top: 10px;
+    right: 14px;
+    background: none;
+    border: none;
+    font-size: 1.6rem;
+    color: #666;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.modal-overlay .modal-close:hover { color: #000; }
+
+@keyframes modalFadeIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}

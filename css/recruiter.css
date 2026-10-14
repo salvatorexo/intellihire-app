@@ -279,3 +279,193 @@
     from { opacity: 0; transform: translateY(-8px); }
     to   { opacity: 1; transform: translateY(0); }
 }
+
+/* =========================================================
+   Edit Modal — polished design (scoped to #editModal only)
+   ========================================================= */
+
+#editModal .modal {
+    background: #ffffff;
+    border-radius: 16px;
+    max-width: 760px;
+    width: 100%;
+    padding: 0;
+    overflow: hidden;
+    box-shadow: 0 25px 60px rgba(15, 23, 42, 0.25),
+                0 8px 20px rgba(15, 23, 42, 0.12);
+    font-family: 'Poppins', system-ui, -apple-system, sans-serif;
+    animation: editModalIn 0.22s ease-out;
+}
+
+@keyframes editModalIn {
+    from { opacity: 0; transform: translateY(12px) scale(0.98); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Header strip with gradient */
+#editModal .modal-body {
+    padding: 0;
+}
+
+#editModal h2 {
+    margin: 0;
+    padding: 22px 30px;
+    font-size: 1.35rem;
+    font-weight: 600;
+    color: #ffffff;
+    background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+    letter-spacing: 0.3px;
+}
+
+/* The form itself */
+#editModal form {
+    padding: 28px 30px 32px;
+    margin: 0;
+}
+
+/* Field layout */
+#editModal .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px 20px;
+}
+
+#editModal .form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+#editModal .form-group.full {
+    grid-column: 1 / -1;
+}
+
+#editModal label {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+/* Inputs, selects, textareas */
+#editModal input[type="text"],
+#editModal input[type="date"],
+#editModal input[type="number"],
+#editModal select,
+#editModal textarea {
+    width: 100%;
+    padding: 11px 14px;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 9px;
+    font-size: 0.92rem;
+    font-family: inherit;
+    color: #111827;
+    background: #f9fafb;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    box-sizing: border-box;
+    resize: vertical;
+}
+
+#editModal input:focus,
+#editModal select:focus,
+#editModal textarea:focus {
+    outline: none;
+    border-color: #2563eb;
+    background: #ffffff;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+}
+
+#editModal textarea {
+    min-height: 80px;
+    line-height: 1.5;
+}
+
+/* Footer actions */
+#editModal .modal-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 26px;
+    padding-top: 20px;
+    border-top: 1px solid #f1f5f9;
+}
+
+#editModal button.btn-primary,
+#editModal #saveBtn {
+    padding: 12px 26px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.92rem;
+    border: none;
+    cursor: pointer;
+    background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.28);
+    transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease;
+}
+
+#editModal button.btn-primary:hover,
+#editModal #saveBtn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.35);
+}
+
+#editModal button.btn-primary:disabled,
+#editModal #saveBtn:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+    transform: none;
+}
+
+#editModal button.btn-outline,
+#editModal #cancelEdit {
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.92rem;
+    cursor: pointer;
+    background: #ffffff;
+    color: #374151;
+    border: 1.5px solid #d1d5db;
+    transition: background 0.12s ease, border-color 0.12s ease;
+}
+
+#editModal button.btn-outline:hover,
+#editModal #cancelEdit:hover {
+    background: #f3f4f6;
+    border-color: #9ca3af;
+}
+
+/* Close (×) button */
+#editModal .modal-close {
+    position: absolute;
+    top: 16px;
+    right: 20px;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.18);
+    color: #ffffff;
+    font-size: 1.3rem;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s ease, transform 0.15s ease;
+}
+
+#editModal .modal-close:hover {
+    background: rgba(255, 255, 255, 0.32);
+    transform: rotate(90deg);
+}
+
+/* Scrollbar (optional, subtle) */
+#editModal .modal::-webkit-scrollbar {
+    width: 8px;
+}
+#editModal .modal::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
